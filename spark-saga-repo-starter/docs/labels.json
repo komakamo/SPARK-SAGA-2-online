@@ -1,0 +1,57 @@
+[
+  {
+    "name": "type:infra",
+    "color": "0e8a16",
+    "description": "Infra/CI/CD/Pages/PWA"
+  },
+  {
+    "name": "type:engine",
+    "color": "1d76db",
+    "description": "ゲームエンジン/ロジック"
+  },
+  {
+    "name": "type:data",
+    "color": "5319e7",
+    "description": "データ/JSON/スキーマ"
+  },
+  {
+    "name": "type:ui",
+    "color": "fbca04",
+    "description": "UI/UX/表示"
+  },
+  {
+    "name": "type:test",
+    "color": "d93f0b",
+    "description": "自動テスト/E2E"
+  },
+  {
+    "name": "priority:P0",
+    "color": "b60205",
+    "description": "最優先"
+  },
+  {
+    "name": "priority:P1",
+    "color": "d73a4a",
+    "description": "高優先度"
+  },
+  {
+    "name": "priority:P2",
+    "color": "f9d0c4",
+    "description": "通常"
+  },
+  {
+    "name": "status:blocker",
+    "color": "000000",
+    "description": "ブロッカー"
+  },
+  {
+    "name": "good-first-issue",
+    "color": "7057ff",
+    "description": "初手に良い小粒"
+  },
+  {
+    "name": "bug",
+    "color": "d73a4a",
+    "description": "不具合"
+  }
+]
