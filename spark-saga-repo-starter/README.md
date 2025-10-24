@@ -5,7 +5,7 @@
 ## まずはこれだけ（0円運用）
 1. GitHub Pages を **Settings → Pages → Source: GitHub Actions** に設定
 2. このリポジトリを `main` ブランチに push すると、Actions が走って公開されます
-3. 公開URLは Actions 実行後にここへ追記してください → **（あとでURL貼る）**
+3. 公開URLは Actions 実行後にここへ追記してください → **（[(https://komakamo.github.io/SPARK-SAGA-2-online/)）】**
 
 ## 構成
 - `docs/spec.md` … 完全仕様書（このプロジェクトの真実のソース）
