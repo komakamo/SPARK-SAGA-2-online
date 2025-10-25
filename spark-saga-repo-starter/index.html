@@ -9,7 +9,17 @@
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <div class="card">
+    <div id="loading-screen">
+      <h1>Loading...</h1>
+    </div>
+
+    <div id="error-screen" hidden>
+      <h1>Error</h1>
+      <p id="error-message"></p>
+      <button id="retry-button">Retry</button>
+    </div>
+
+    <div class="card" hidden>
       <h1>SPARK SAGA（仮）</h1>
       <p>
         ここはプレースホルダーです。ゲーム本体は
@@ -24,6 +34,7 @@
         v0.0.1 — PWAプレースホルダ。仕様は <code>docs/spec.md</code> を参照。
       </div>
     </div>
+    <div id="dev-diagnostics" hidden></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
