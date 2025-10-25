@@ -1,3 +1,9 @@
+import { SceneManager } from './managers/SceneManager';
+import { TitleScene } from './scenes/TitleScene';
+import { FieldScene } from './scenes/FieldScene';
+import { BattleScene } from './scenes/BattleScene';
+import { ResultScene } from './scenes/ResultScene';
+import { MenuScene } from './scenes/MenuScene';
 import { loadGameData, gameData } from './data-loader';
 
 const loadingScreen = document.getElementById('loading-screen')!;
@@ -29,15 +35,25 @@ async function startGame() {
   }
 
   loadingScreen.hidden = true;
-  mainContent.hidden = false;
 
   if (import.meta.env.DEV) {
     devDiagnostics.hidden = false;
     devDiagnostics.textContent = `Loaded ${Object.keys(gameData).length} data files with ${warnings.length} warnings.`;
   }
 
-  // You can now access the loaded and indexed data from the `gameData` object.
-  console.log('Game data is ready:', gameData);
+  // Initialize and start the scene manager
+  const sceneManager = new SceneManager();
+  sceneManager.addScene('title', new TitleScene(sceneManager));
+  sceneManager.addScene('field', new FieldScene(sceneManager));
+  sceneManager.addScene('battle', new BattleScene(sceneManager));
+  sceneManager.addScene('result', new ResultScene(sceneManager));
+  sceneManager.addScene('menu', new MenuScene(sceneManager));
+  sceneManager.start('title');
+
+  // Expose sceneManager to the window for debugging
+  if (import.meta.env.DEV) {
+    (window as any).sceneManager = sceneManager;
+  }
 }
 
 retryButton.addEventListener('click', startGame);
