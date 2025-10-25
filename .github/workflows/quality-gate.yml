@@ -82,9 +82,30 @@ jobs:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           pattern: "spark-saga-repo-starter/dist/**/*.js"
 
+  validate-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd spark-saga-repo-starter
+          npm ci
+
+      - name: Validate Data
+        run: |
+          cd spark-saga-repo-starter
+          npm run validate:data
+
   report-failure:
     runs-on: ubuntu-latest
-    needs: [type-check, lighthouse, bundle-size]
+    needs: [type-check, lighthouse, bundle-size, validate-data]
     if: failure()
     steps:
       - name: Post comment
@@ -98,5 +119,6 @@ jobs:
             - **Type Check:** ${{ needs.type-check.result }}
             - **Lighthouse:** ${{ needs.lighthouse.result }}
             - **Bundle Size:** ${{ needs.bundle-size.result }}
+            - **Data Validation:** ${{ needs.validate-data.result }}
 
             Please address the issues before this pull request can be merged.
