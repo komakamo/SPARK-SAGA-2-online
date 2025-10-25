@@ -16,8 +16,3 @@
 - `index.html` / `public/manifest.json` / `sw.js` … **最低限のPWA**（オフラインでプレースホルダが起動）
 - `ASSETS_LICENSE.md`, `CREDITS.md`, `LICENSE` … ライセンス台帳
 
-## 次の一手
-- Issues から **#1 雛形＋Pages＋PWA** / **#2 データローダ** / **#3 戦闘最小** を作って Jules に任せる
-- 企画の更新は **docs/spec.md** を編集（PRで管理）
-
-> このリポジトリにゲームロジックのコードはまだありません。実装は Jules のPRで入ります。
