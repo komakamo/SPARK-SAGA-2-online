@@ -1,0 +1,37 @@
+{
+  "name": "spark-saga-repo-starter",
+  "version": "1.0.0",
+  "description": "**目的:** ロマサガ風の“多主人公×自由探索×閃き”体験を、**ブラウザ1クリック起動**で公開。実装は Google の AI コーディングエージェント *Jules* に任せ、あなたは企画・仕様・レビューに専念します。",
+  "main": "commitlint.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "cd .. && husky install spark-saga-repo-starter/.husky",
+    "format": "prettier --write .",
+    "lint": "eslint --fix ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.38.0",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2"
+  },
+  "lint-staged": {
+    "*.{js,html,css,md}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  }
+}

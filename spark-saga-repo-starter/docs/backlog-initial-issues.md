@@ -3,21 +3,25 @@
 > 各Issueには「目的/要件/受入/参照(§)」を必ず記載し、小粒に分割してください。
 
 ## #1 雛形＋Pages＋PWA（P0, type:infra）
+
 目的: URLを開くと即起動、オフラインでも前回版が立ち上がる  
 要件: index.html, manifest.json, sw.js, ActionsでPages公開 / Lighthouse PWA installable  
 受入: 機内モードで再起動OK / 初回≤6s, 再訪≤3s / バンドル<1.5MB
 
 ## #2 データローダ＋スキーマ検証（P0, type:engine,type:test）
-目的: /data/*.json を型安全に読み、未定義参照はCIで検出  
+
+目的: /data/\*.json を型安全に読み、未定義参照はCIで検出
 要件: skill/enemy/formation/quest など最低1件のダミー  
 受入: 正常データで緑 / 参照ミスでCI赤
 
 ## #3 戦闘最小＆ログ（P0, type:engine,type:test）
+
 目的: 1体vs1体の攻撃→被ダメ→撃破まで通す  
 要件: ダメージ式・命中回避・行動順 / リソースUI / 平均ダメの統計テスト  
 受入: 手動で1勝負成立 / テスト緑
 
 ## 以降（例）
+
 - 会話エンジン最小（分岐/フラグ/外部文言）
 - 状態異常基盤（毒/スタン/沈黙）＋テスト
 - 陣形効果＆UI（6種）
