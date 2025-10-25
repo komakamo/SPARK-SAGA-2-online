@@ -1,31 +1,37 @@
 import { Scene } from './Scene';
 import { SceneManager } from '../managers/SceneManager';
+import { InputManager, Action } from '../input/InputManager';
+import { UIManager } from '../ui/UIManager';
 
 export class MenuScene implements Scene {
   private element: HTMLElement;
-  private closeMenuButton: HTMLElement;
   private sceneManager: SceneManager;
+  public inputManager: InputManager;
+  public uiManager: UIManager;
 
-  constructor(sceneManager: SceneManager) {
+  constructor(
+    sceneManager: SceneManager,
+    inputManager: InputManager,
+    uiManager: UIManager,
+  ) {
     this.element = document.getElementById('menu-scene')!;
-    this.closeMenuButton = document.getElementById('close-menu-button')!;
     this.sceneManager = sceneManager;
-
-    this.onCloseMenu = this.onCloseMenu.bind(this);
+    this.inputManager = inputManager;
+    this.uiManager = uiManager;
   }
 
   enter(): void {
     this.element.hidden = false;
-    this.closeMenuButton.addEventListener('click', this.onCloseMenu);
   }
 
   exit(): void {
     this.element.hidden = true;
-    this.closeMenuButton.removeEventListener('click', this.onCloseMenu);
   }
 
   update(deltaTime: number): void {
-    // Menu scene logic
+    if (this.inputManager.isActionJustPressed(Action.Cancel)) {
+      this.sceneManager.closeOverlay();
+    }
   }
 
   render(): void {

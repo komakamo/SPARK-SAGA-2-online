@@ -1,3 +1,5 @@
+import { InputManager } from './input/InputManager';
+import { UIManager } from './ui/UIManager';
 import { SceneManager } from './managers/SceneManager';
 import { TitleScene } from './scenes/TitleScene';
 import { FieldScene } from './scenes/FieldScene';
@@ -42,12 +44,14 @@ async function startGame() {
   }
 
   // Initialize and start the scene manager
-  const sceneManager = new SceneManager();
-  sceneManager.addScene('title', new TitleScene(sceneManager));
-  sceneManager.addScene('field', new FieldScene(sceneManager));
-  sceneManager.addScene('battle', new BattleScene(sceneManager));
-  sceneManager.addScene('result', new ResultScene(sceneManager));
-  sceneManager.addScene('menu', new MenuScene(sceneManager));
+  const inputManager = new InputManager();
+  const uiManager = new UIManager(inputManager);
+  const sceneManager = new SceneManager(inputManager, uiManager);
+  sceneManager.addScene('title', new TitleScene(sceneManager, inputManager, uiManager));
+  sceneManager.addScene('field', new FieldScene(sceneManager, inputManager, uiManager));
+  sceneManager.addScene('battle', new BattleScene(sceneManager, inputManager, uiManager));
+  sceneManager.addScene('result', new ResultScene(sceneManager, inputManager, uiManager));
+  sceneManager.addScene('menu', new MenuScene(sceneManager, inputManager, uiManager));
   sceneManager.start('title');
 
   // Expose sceneManager to the window for debugging

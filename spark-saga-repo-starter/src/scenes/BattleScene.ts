@@ -1,41 +1,41 @@
 import { Scene } from './Scene';
 import { SceneManager } from '../managers/SceneManager';
+import { InputManager, Action } from '../input/InputManager';
+import { UIManager } from '../ui/UIManager';
 
 export class BattleScene implements Scene {
   private element: HTMLElement;
-  private victoryButton: HTMLElement;
-  private escapeButton: HTMLElement;
-  private gameoverButton: HTMLElement;
   private sceneManager: SceneManager;
+  public inputManager: InputManager;
+  public uiManager: UIManager;
 
-  constructor(sceneManager: SceneManager) {
+  constructor(
+    sceneManager: SceneManager,
+    inputManager: InputManager,
+    uiManager: UIManager,
+  ) {
     this.element = document.getElementById('battle-scene')!;
-    this.victoryButton = document.getElementById('victory-button')!;
-    this.escapeButton = document.getElementById('escape-button')!;
-    this.gameoverButton = document.getElementById('gameover-button')!;
     this.sceneManager = sceneManager;
-
-    this.onVictory = this.onVictory.bind(this);
-    this.onEscape = this.onEscape.bind(this);
-    this.onGameOver = this.onGameOver.bind(this);
+    this.inputManager = inputManager;
+    this.uiManager = uiManager;
   }
 
   enter(): void {
     this.element.hidden = false;
-    this.victoryButton.addEventListener('click', this.onVictory);
-    this.escapeButton.addEventListener('click', this.onEscape);
-    this.gameoverButton.addEventListener('click', this.onGameOver);
+    this.uiManager.updateHelpDisplay();
   }
 
   exit(): void {
     this.element.hidden = true;
-    this.victoryButton.removeEventListener('click', this.onVictory);
-    this.escapeButton.removeEventListener('click', this.onEscape);
-    this.gameoverButton.removeEventListener('click', this.onGameOver);
   }
 
   update(deltaTime: number): void {
-    // Battle scene logic
+    if (this.inputManager.isActionJustPressed(Action.Confirm)) {
+      this.sceneManager.changeScene('result'); // Victory
+    }
+    if (this.inputManager.isActionJustPressed(Action.Cancel)) {
+      this.sceneManager.changeScene('field'); // Escape
+    }
   }
 
   render(): void {

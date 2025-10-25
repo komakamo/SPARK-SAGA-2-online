@@ -1,15 +1,20 @@
 import { Scene } from '../scenes/Scene';
+import { InputManager, Action } from '../input/InputManager';
+import { UIManager } from '../ui/UIManager';
 
 export class SceneManager {
   private currentScene: Scene | null = null;
-  private pausedScene: Scene | null = null; // To store the scene when an overlay is active
+  private pausedScene: Scene | null = null;
   private scenes: Map<string, Scene> = new Map();
   private lastTime: number = 0;
-  public isPaused = false; // Public flag to let scenes know the state
+  public isPaused = false;
+  private inputManager: InputManager;
+  private uiManager: UIManager;
 
-  constructor() {
+  constructor(inputManager: InputManager, uiManager: UIManager) {
+    this.inputManager = inputManager;
+    this.uiManager = uiManager;
     this.gameLoop = this.gameLoop.bind(this);
-    this.handleKeyUp = this.handleKeyUp.bind(this);
   }
 
   addScene(name: string, scene: Scene): void {
@@ -83,39 +88,38 @@ export class SceneManager {
 
   start(initialSceneName: string): void {
     this.changeScene(initialSceneName);
-    window.addEventListener('keyup', this.handleKeyUp);
     this.lastTime = performance.now();
     requestAnimationFrame(this.gameLoop);
   }
 
   destroy(): void {
-    window.removeEventListener('keyup', this.handleKeyUp);
-  }
-
-  private handleKeyUp(e: KeyboardEvent): void {
-    if (e.key === 'Escape') {
-      // Can only open menu from Field or Battle
-      const canOpenMenu = this.currentScene?.constructor.name === 'FieldScene' || this.currentScene?.constructor.name === 'BattleScene';
-
-      if (this.isPaused) {
-        this.closeOverlay();
-      } else if (canOpenMenu) {
-        this.openOverlay('menu');
-      }
-    }
+    // Clean up any listeners if necessary
   }
 
   private gameLoop(currentTime: number): void {
+    this.inputManager.update(); // Update input state first
+
     const deltaTime = (currentTime - this.lastTime) / 1000;
     this.lastTime = currentTime;
 
+    if (this.inputManager.isActionJustPressed(Action.Menu)) {
+      this.handleMenuToggle();
+    }
+
     if (this.currentScene) {
-      // Only update the current scene (which could be an overlay)
       this.currentScene.update(deltaTime);
-      // The paused scene is not updated, effectively pausing it
       this.currentScene.render();
     }
 
     requestAnimationFrame(this.gameLoop);
+  }
+
+  private handleMenuToggle(): void {
+    const canOpenMenu = this.currentScene?.constructor.name === 'FieldScene' || this.currentScene?.constructor.name === 'BattleScene';
+    if (this.isPaused) {
+      this.closeOverlay();
+    } else if (canOpenMenu) {
+      this.openOverlay('menu');
+    }
   }
 }
