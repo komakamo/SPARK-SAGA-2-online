@@ -8,7 +8,7 @@ import path from 'path';
 import { ZodError, z } from 'zod';
 import { zodSchemaToMarkdown } from 'zod-to-markdown';
 
-const DATA_DIR = path.resolve(__dirname, '../data');
+const DATA_DIR = path.resolve(__dirname, '../public/data');
 
 type ValidationResult = {
   file: string;
@@ -36,21 +36,21 @@ async function validateFile(filePath: string, schema: z.ZodSchema<any>): Promise
 async function validateSchemas() {
   console.log('Validating schemas...');
   const schemas = {
-    'skill.json': (await import('../data/schemas/skill')).skillsSchema,
-    'weapon.json': (await import('../data/schemas/weapon')).weaponsSchema,
-    'armor.json': (await import('../data/schemas/armor')).armorsSchema,
-    'item.json': (await import('../data/schemas/item')).itemsSchema,
-    'enemy.json': (await import('../data/schemas/enemy')).enemiesSchema,
-    'formation.json': (await import('../data/schemas/formation')).formationsSchema,
-    'event.json': (await import('../data/schemas/event')).eventsSchema,
-    'quest.json': (await import('../data/schemas/quest')).questsSchema,
-    'shop.json': (await import('../data/schemas/shop')).shopsSchema,
-    'faction.json': (await import('../data/schemas/faction')).factionsSchema,
-    'loot_table.json': (await import('../data/schemas/loot_table')).lootTablesSchema,
-    'balance.json': (await import('../data/schemas/balance')).balanceSchema,
-    'er.json': (await import('../data/schemas/er')).erSchema,
-    'i18n/ja.json': (await import('../data/schemas/i18n')).i18nSchema,
-    'i18n/en.json': (await import('../data/schemas/i18n')).i18nSchema,
+    'skill.json': (await import('../src/schemas/skill')).skillsSchema,
+    'weapon.json': (await import('../src/schemas/weapon')).weaponsSchema,
+    'armor.json': (await import('../src/schemas/armor')).armorsSchema,
+    'item.json': (await import('../src/schemas/item')).itemsSchema,
+    'enemy.json': (await import('../src/schemas/enemy')).enemiesSchema,
+    'formation.json': (await import('../src/schemas/formation')).formationsSchema,
+    'event.json': (await import('../src/schemas/event')).eventsSchema,
+    'quest.json': (await import('../src/schemas/quest')).questsSchema,
+    'shop.json': (await import('../src/schemas/shop')).shopsSchema,
+    'faction.json': (await import('../src/schemas/faction')).factionsSchema,
+    'loot_table.json': (await import('../src/schemas/loot_table')).lootTablesSchema,
+    'balance.json': (await import('../src/schemas/balance')).balanceSchema,
+    'er.json': (await import('../src/schemas/er')).erSchema,
+    'i18n/ja.json': (await import('../src/schemas/i18n')).i18nSchema,
+    'i18n/en.json': (await import('../src/schemas/i18n')).i18nSchema,
   };
 
   const validationPromises = Object.entries(schemas).map(([fileName, schema]) =>
@@ -312,7 +312,7 @@ async function generateDocumentation() {
   let markdown = '# Data Model\n\n';
 
   for (const file of schemaFiles) {
-    const module = await import(`../data/schemas/${file}`);
+    const module = await import(`../src/schemas/${file}`);
     const schemaName = Object.keys(module).find(key => key.endsWith('Schema'));
     if (schemaName) {
       const schema = module[schemaName];

@@ -37,8 +37,10 @@
     "vite": "^7.1.12",
     "vite-plugin-pwa": "^1.1.0",
     "vitest": "^4.0.3",
-    "zod": "^4.1.12",
     "zod-to-markdown": "^1.0.2"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
   },
   "lint-staged": {
     "*.{js,html,css,md}": [
