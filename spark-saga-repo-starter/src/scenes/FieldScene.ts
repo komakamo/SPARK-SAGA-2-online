@@ -2,12 +2,21 @@ import { Scene } from './Scene';
 import { SceneManager } from '../managers/SceneManager';
 import { InputManager, Action } from '../input/InputManager';
 import { UIManager } from '../ui/UIManager';
+import { Tilemap, TilemapData } from '../map/Tilemap';
+import { Player } from '../map/Player';
+import { EventManager } from '../managers/EventManager';
 
 export class FieldScene implements Scene {
   private element: HTMLElement;
   private sceneManager: SceneManager;
   public inputManager: InputManager;
   public uiManager: UIManager;
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
+  private tilemap: Tilemap | null = null;
+  private player: Player;
+  private eventManager: EventManager;
+  private isDebugMode: boolean = false;
 
   constructor(
     sceneManager: SceneManager,
@@ -18,11 +27,19 @@ export class FieldScene implements Scene {
     this.sceneManager = sceneManager;
     this.inputManager = inputManager;
     this.uiManager = uiManager;
+    this.canvas = document.getElementById('field-canvas') as HTMLCanvasElement;
+    this.ctx = this.canvas.getContext('2d')!;
+    this.player = new Player(32, 32);
+    this.eventManager = new EventManager(this.uiManager);
   }
 
-  enter(): void {
+  async enter(): Promise<void> {
     this.element.hidden = false;
     this.uiManager.updateHelpDisplay();
+
+    const response = await fetch('/maps/field.json');
+    const data: TilemapData = await response.json();
+    this.tilemap = new Tilemap(data);
   }
 
   exit(): void {
@@ -30,13 +47,26 @@ export class FieldScene implements Scene {
   }
 
   update(deltaTime: number): void {
+    if (this.tilemap) {
+      this.player.update(deltaTime, this.inputManager, this.tilemap);
+    }
     if (this.inputManager.isActionJustPressed(Action.Confirm)) {
-      this.sceneManager.changeScene('battle');
+        const eventId = this.tilemap?.getEvent(this.player.x, this.player.y);
+        if (eventId) {
+            this.eventManager.triggerEvent(eventId);
+        }
+    }
+    if (this.inputManager.isActionJustPressed(Action.Menu)) {
+        this.isDebugMode = !this.isDebugMode;
     }
   }
 
   render(): void {
-    // Field scene rendering
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    if (this.tilemap) {
+      this.tilemap.render(this.ctx, this.isDebugMode);
+    }
+    this.player.render(this.ctx);
   }
 
   pause(): void {
