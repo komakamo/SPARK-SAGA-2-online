@@ -26,11 +26,43 @@
     <div class="small">v0.0.1 — PWAプレースホルダ。仕様は <code>docs/spec.md</code> を参照。</div>
   </div>
   <script>
+    // --- PWA Service Worker ---
     if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
-    // PWA install prompt
+
+    // --- PWA Install Prompt ---
     let deferredPrompt; const btn=document.getElementById('installBtn');
     window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; btn.hidden=false; });
-    btn?.addEventListener('click', async()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); const {outcome}=await deferredPrompt.userChoice; deferredPrompt=null; btn.hidden=true; });
+    btn?.addEventListener('click', async()=>{
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const {outcome}=await deferredPrompt.userChoice;
+      deferredPrompt=null;
+      btn.hidden=true;
+    });
+
+    // --- Performance Telemetry (Pseudo) ---
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const perf = window.performance?.getEntriesByType?.('navigation')?.[0];
+        if (!perf) return;
+        const isReload = perf.type === 'reload';
+        const loadTime = Math.round(perf.duration);
+        console.log(
+          `%c[SPARK SAGA] Telemetry %c(pseudo)`,
+          'font-weight:bold; color:#38bdf8;',
+          'font-weight:normal; color:inherit;'
+        );
+        console.log(`- Page Load Time: %c${loadTime}ms`, 'font-weight:bold;');
+        console.log(`- Visit Type: %c${isReload ? 'Reload' : 'Initial' }`, 'font-weight:bold;');
+        console.log(`- Spec: Initial ≤6000ms, Re-visit ≤3000ms`);
+        const goal = isReload ? 3000 : 6000;
+        if (loadTime <= goal) {
+          console.log(`%c- Result: PASSED`, 'color:#22c55e;');
+        } else {
+          console.log(`%c- Result: FAILED`, 'color:#ef4444;');
+        }
+      }, 0);
+    });
   </script>
 </body>
 </html>
