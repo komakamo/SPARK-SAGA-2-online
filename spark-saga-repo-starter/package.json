@@ -7,7 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
     "prepare": "cd .. && husky install spark-saga-repo-starter/.husky",
     "format": "prettier --write .",
     "lint": "eslint --fix ."
@@ -26,7 +29,11 @@
     "globals": "^16.4.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.6",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12",
+    "vite-plugin-pwa": "^1.1.0",
+    "vitest": "^4.0.3"
   },
   "lint-staged": {
     "*.{js,html,css,md}": [
