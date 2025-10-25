@@ -3,6 +3,8 @@
 “SaGa-like”自由度JRPG。**ブラウザ1クリック起動**／**PWAオフライン対応**／**データ駆動（JSON）**  
 開発は**GoogleのAIエージェント Jules**が実装とPRを担当し、企画・レビュー・データ編集のみで運用します。
 
+公開URLは Actions 実行後にここへ追記してください → **（[(https://komakamo.github.io/SPARK-SAGA-2-online/)）】**
+
 ---
 
 ## 特長
