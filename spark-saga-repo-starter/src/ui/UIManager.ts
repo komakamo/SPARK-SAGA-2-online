@@ -7,6 +7,7 @@ export class UIManager {
   private main: HTMLElement;
   private footer: HTMLElement;
   private helpDisplay: HTMLElement;
+  private logPane: HTMLElement;
   private touchControls: HTMLElement;
   private inputManager: InputManager;
 
@@ -15,6 +16,7 @@ export class UIManager {
     this.header = document.getElementById('ui-header')!;
     this.main = document.getElementById('ui-main')!;
     this.footer = document.getElementById('ui-footer')!;
+    this.logPane = document.getElementById('log-pane')!;
     this.helpDisplay = document.getElementById('help-display')!;
     this.touchControls = document.getElementById('touch-controls')!;
     this.inputManager = inputManager;
@@ -33,6 +35,13 @@ export class UIManager {
       helpText = 'Touch: D-Pad, A, B, M';
     }
     this.helpDisplay.textContent = helpText;
+  }
+
+  public log(message: string): void {
+    const logEntry = document.createElement('p');
+    logEntry.textContent = message;
+    this.logPane.appendChild(logEntry);
+    this.logPane.scrollTop = this.logPane.scrollHeight;
   }
 
   private setupTouchControls(): void {
