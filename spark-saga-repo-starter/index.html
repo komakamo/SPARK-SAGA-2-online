@@ -3,12 +3,63 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SPARK SAGA — Coming Soon</title>
+    <title>SPARK SAGA</title>
     <link rel="manifest" href="public/manifest.json" />
     <meta name="theme-color" content="#0f172a" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
+    <div id="ui-container">
+      <header id="ui-header">
+        <h1>SPARK SAGA</h1>
+      </header>
+      <main id="ui-main">
+        <div id="title-scene" hidden>
+          <h1>Title Screen</h1>
+          <button id="new-game-button">New Game</button>
+        </div>
+        <div id="field-scene" hidden>
+          <h1>Field</h1>
+          <p>Exploring the world...</p>
+          <button id="encounter-button">Encounter Enemy</button>
+        </div>
+        <div id="battle-scene" hidden>
+          <h1>Battle</h1>
+          <button id="victory-button">Victory</button>
+          <button id="escape-button">Escape</button>
+          <button id="gameover-button">Game Over</button>
+        </div>
+        <div id="result-scene" hidden>
+          <h1>Result</h1>
+          <p>You won!</p>
+          <button id="back-to-field-button">Back to Field</button>
+        </div>
+        <div id="menu-scene" class="overlay" hidden>
+          <div class="card">
+            <h1>Menu</h1>
+            <button id="close-menu-button">Close</button>
+          </div>
+        </div>
+      </main>
+      <footer id="ui-footer">
+        <div id="log-pane"></div>
+      </footer>
+      <div id="help-display"></div>
+      <div id="touch-controls" hidden>
+        <div id="d-pad">
+          <button id="d-pad-up">↑</button>
+          <button id="d-pad-left">←</button>
+          <button id="d-pad-right">→</button>
+          <button id="d-pad-down">↓</button>
+        </div>
+        <div id="action-buttons">
+          <button id="action-confirm">A</button>
+          <button id="action-cancel">B</button>
+          <button id="action-menu">M</button>
+        </div>
+      </div>
+    </div>
+
     <div id="loading-screen">
       <h1>Loading...</h1>
     </div>
@@ -19,49 +70,7 @@
       <button id="retry-button">Retry</button>
     </div>
 
-    <div class="card" hidden>
-      <h1>SPARK SAGA（仮）</h1>
-      <p>
-        ここはプレースホルダーです。ゲーム本体は
-        <strong>JulesのPR</strong> で実装され、GitHub Pages
-        に自動デプロイされます。
-      </p>
-      <p>
-        オフラインでもこの画面は起動します（PWA）。スマホでは「ホーム画面に追加」して遊べます。
-      </p>
-      <button id="installBtn" hidden>インストール</button>
-      <div class="small">
-        v0.0.1 — PWAプレースホルダ。仕様は <code>docs/spec.md</code> を参照。
-      </div>
-    </div>
     <div id="dev-diagnostics" hidden></div>
-
-    <div id="title-scene" hidden>
-      <h1>Title Screen</h1>
-      <button id="new-game-button">New Game</button>
-    </div>
-    <div id="field-scene" hidden>
-      <h1>Field</h1>
-      <p>Exploring the world...</p>
-      <button id="encounter-button">Encounter Enemy</button>
-    </div>
-    <div id="battle-scene" hidden>
-      <h1>Battle</h1>
-      <button id="victory-button">Victory</button>
-      <button id="escape-button">Escape</button>
-      <button id="gameover-button">Game Over</button>
-    </div>
-    <div id="result-scene" hidden>
-      <h1>Result</h1>
-      <p>You won!</p>
-      <button id="back-to-field-button">Back to Field</button>
-    </div>
-    <div id="menu-scene" class="overlay" hidden>
-      <div class="card">
-        <h1>Menu</h1>
-        <button id="close-menu-button">Close</button>
-      </div>
-    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
