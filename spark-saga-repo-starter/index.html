@@ -25,12 +25,6 @@
     <button id="installBtn" hidden>インストール</button>
     <div class="small">v0.0.1 — PWAプレースホルダ。仕様は <code>docs/spec.md</code> を参照。</div>
   </div>
-  <script>
-    if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
-    // PWA install prompt
-    let deferredPrompt; const btn=document.getElementById('installBtn');
-    window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; btn.hidden=false; });
-    btn?.addEventListener('click', async()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); const {outcome}=await deferredPrompt.userChoice; deferredPrompt=null; btn.hidden=true; });
-  </script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

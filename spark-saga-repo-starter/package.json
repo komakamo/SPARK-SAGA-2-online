@@ -1,0 +1,21 @@
+{
+  "name": "spark-saga-repo-starter",
+  "version": "1.0.0",
+  "description": "**目的:** ロマサガ風の“多主人公×自由探索×閃き”体験を、**ブラウザ1クリック起動**で公開。実装は Google の AI コーディングエージェント *Jules* に任せ、あなたは企画・仕様・レビューに専念します。",
+  "main": "sw.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .ts",
+    "test": "vitest",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}

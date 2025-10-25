@@ -1,0 +1,122 @@
+name: CI Quality Gate
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: spark-saga-repo-starter/package-lock.json
+
+      - name: Install dependencies
+        run: cd spark-saga-repo-starter && npm ci
+
+      - name: Type Check & Build
+        run: cd spark-saga-repo-starter && npm run build
+
+      - name: Lint
+        run: cd spark-saga-repo-starter && npm run lint
+
+      - name: Check Bundle Size
+        id: bundle_size
+        run: |
+          SIZE_BYTES=$(du -sb spark-saga-repo-starter/dist | awk '{print $1}')
+          SIZE_MB=$(echo "scale=2; $SIZE_BYTES / 1024 / 1024" | bc)
+          echo "Bundle size: $SIZE_MB MB"
+          echo "size_mb=$SIZE_MB" >> $GITHUB_OUTPUT
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        run: |
+          cd spark-saga-repo-starter
+          npm install -g @lhci/cli@0.13.x serve
+          serve -s dist &
+          SERVER_PID=$!
+          lhci autorun --collect.staticDistDir=dist --upload.target=temporary-public-storage || echo "Lighthouse CI execution failed!"
+          kill $SERVER_PID
+          # Extract scores and report URL
+          PERF=$(jq '.[] | .summary.performance' .lighthouseci/assertion-results.json)
+          ACCESSIBILITY=$(jq '.[] | .summary.accessibility' .lighthouseci/assertion-results.json)
+          REPORT_URL=$(jq -r '.[] | .url' .lighthouseci/links.json)
+
+          echo "Lighthouse Performance Score: $PERF"
+          echo "Lighthouse Accessibility Score: $ACCESSIBILITY"
+          echo "report_url=$REPORT_URL" >> $GITHUB_OUTPUT
+          echo "performance_score=$PERF" >> $GITHUB_OUTPUT
+          echo "accessibility_score=$ACCESSIBILITY" >> $GITHUB_OUTPUT
+
+      - name: Post PR Comment
+        uses: actions/github-script@v7
+        if: always() # Ensure this step runs even if previous steps fail
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const bundleSize = ${{ steps.bundle_size.outputs.size_mb }};
+            const perfScore = ${{ steps.lighthouse.outputs.performance_score }} * 100;
+            const accessScore = ${{ steps.lighthouse.outputs.accessibility_score }} * 100;
+            const reportUrl = "${{ steps.lighthouse.outputs.report_url }}";
+
+            let commentBody = `## CI Quality Gate Results 📉\n\n`;
+            let issuesFound = false;
+
+            // Bundle Size Check
+            commentBody += `### 📦 Bundle Size\n`;
+            commentBody += `- **Size:** ${bundleSize} MB\n`;
+            if (bundleSize > 2.0) {
+              issuesFound = true;
+              commentBody += `- 🔴 **Status:** FAILED (Threshold: < 2.0 MB)\n`;
+              commentBody += `- **Suggestion:** Please analyze the bundle composition and consider code splitting or asset optimization.\n`;
+            } else {
+              commentBody += `- ✅ **Status:** PASSED\n`;
+            }
+
+            // Lighthouse Check
+            commentBody += `\n### Lighthouse Scores\n`;
+            if (reportUrl) {
+              commentBody += `[View Full Lighthouse Report](${reportUrl})\n`;
+            }
+
+            // Performance
+            commentBody += `- **Performance:** ${perfScore}\n`;
+            if (perfScore < 70) {
+              issuesFound = true;
+              commentBody += `- 🔴 **Status:** FAILED (Threshold: ≥ 70)\n`;
+              commentBody += `- **Suggestion:** Check the report for performance bottlenecks.\n`;
+            } else {
+              commentBody += `- ✅ **Status:** PASSED\n`;
+            }
+
+            // Accessibility
+            commentBody += `- **Accessibility:** ${accessScore}\n`;
+            if (accessScore < 90) {
+              issuesFound = true;
+              commentBody += `- 🔴 **Status:** FAILED (Threshold: ≥ 90)\n`;
+              commentBody += `- **Suggestion:** Review the accessibility report for issues.\n`;
+            } else {
+              commentBody += `- ✅ **Status:** PASSED\n`;
+            }
+
+            if (issuesFound) {
+              commentBody += `\n---\n\n**Action Required:** Please address the issues above.`;
+              core.setFailed('Quality gate failed. See the PR comment for details.');
+            } else {
+              commentBody = `## ✅ CI Quality Gate Passed\n\nAll checks passed.\n\n- **Bundle Size:** ${bundleSize} MB\n- **Lighthouse Performance:** ${perfScore}\n- **Lighthouse Accessibility:** ${accessScore}\n\n[View Full Lighthouse Report](${reportUrl})`;
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
