@@ -8,6 +8,8 @@ export class ResultScene implements Scene {
   private sceneManager: SceneManager;
   public inputManager: InputManager;
   public uiManager: UIManager;
+  private expGainedElement: HTMLElement;
+  private goldGainedElement: HTMLElement;
 
   constructor(
     sceneManager: SceneManager,
@@ -18,11 +20,16 @@ export class ResultScene implements Scene {
     this.sceneManager = sceneManager;
     this.inputManager = inputManager;
     this.uiManager = uiManager;
+    this.expGainedElement = document.getElementById('exp-gained')!;
+    this.goldGainedElement = document.getElementById('gold-gained')!;
   }
 
   enter(): void {
     this.element.hidden = false;
     this.uiManager.updateHelpDisplay();
+    // TODO: Replace with actual data
+    this.expGainedElement.textContent = '10';
+    this.goldGainedElement.textContent = '5';
   }
 
   exit(): void {
@@ -37,9 +44,5 @@ export class ResultScene implements Scene {
 
   render(): void {
     // Result scene rendering
-  }
-
-  private onBackToField(): void {
-    this.sceneManager.changeScene('field');
   }
 }

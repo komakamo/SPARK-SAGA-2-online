@@ -113,6 +113,6 @@ export class UIManager {
     document.getElementById('action-cancel')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.Cancel, true));
     document.getElementById('action-cancel')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.Cancel, false));
     document.getElementById('action-menu')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.Menu, true));
-    document.getElementById('action-menu')!.addEventListener('touchend', ()_ => this.inputManager.setActionState(Action.Menu, false));
+    document.getElementById('action-menu')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.Menu, false));
   }
 }

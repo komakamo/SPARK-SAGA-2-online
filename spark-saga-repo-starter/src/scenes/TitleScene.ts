@@ -26,6 +26,7 @@ export class TitleScene implements Scene {
   enter(): void {
     this.element.hidden = false;
     this.uiManager.updateHelpDisplay();
+    this.element.style.display = 'block';
   }
 
   exit(): void {
