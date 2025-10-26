@@ -1,6 +1,7 @@
 import { InputManager } from './input/InputManager';
 import { UIManager } from './ui/UIManager';
 import { SceneManager } from './managers/SceneManager';
+import { ConversationManager } from './managers/ConversationManager';
 import { TitleScene } from './scenes/TitleScene';
 import { FieldScene } from './scenes/FieldScene';
 import { BattleScene } from './scenes/BattleScene';
@@ -37,6 +38,7 @@ async function startGame() {
   }
 
   loadingScreen.hidden = true;
+  mainContent.hidden = false;
 
   if (import.meta.env.DEV) {
     devDiagnostics.hidden = false;
@@ -45,8 +47,9 @@ async function startGame() {
 
   // Initialize and start the scene manager
   const inputManager = new InputManager();
-  const uiManager = new UIManager(inputManager);
-  const sceneManager = new SceneManager(inputManager, uiManager);
+  const conversationManager = await ConversationManager.initialize();
+  const uiManager = new UIManager(inputManager, conversationManager);
+  const sceneManager = new SceneManager(inputManager, uiManager, conversationManager);
   sceneManager.addScene('title', new TitleScene(sceneManager, inputManager, uiManager));
   sceneManager.addScene('field', new FieldScene(sceneManager, inputManager, uiManager));
   sceneManager.addScene('battle', new BattleScene(sceneManager, inputManager, uiManager));
