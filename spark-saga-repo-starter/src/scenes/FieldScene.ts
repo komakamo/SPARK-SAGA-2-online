@@ -5,6 +5,7 @@ import { UIManager } from '../ui/UIManager';
 import { Tilemap, TilemapData } from '../map/Tilemap';
 import { Player } from '../map/Player';
 import { EventManager } from '../managers/EventManager';
+import { ConversationManager } from '../managers/ConversationManager';
 
 export class FieldScene implements Scene {
   private element: HTMLElement;
@@ -30,7 +31,7 @@ export class FieldScene implements Scene {
     this.canvas = document.getElementById('field-canvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d')!;
     this.player = new Player(32, 32);
-    this.eventManager = new EventManager(this.uiManager);
+    this.eventManager = new EventManager(this.uiManager, this.sceneManager.conversationManager);
   }
 
   async enter(): Promise<void> {

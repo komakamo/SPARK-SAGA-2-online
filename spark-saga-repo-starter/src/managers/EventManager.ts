@@ -1,4 +1,6 @@
 // spark-saga-repo-starter/src/managers/EventManager.ts
+import { UIManager } from '../ui/UIManager';
+import { ConversationManager } from './ConversationManager';
 
 export enum EventType {
   Conversation,
@@ -12,23 +14,23 @@ export interface Event {
   data: any;
 }
 
-import { UIManager } from "../ui/UIManager";
-
 export class EventManager {
   private events: Map<number, Event>;
   private triggeredEvents: Set<number>;
   private uiManager: UIManager;
+  private conversationManager: ConversationManager;
 
-  constructor(uiManager: UIManager) {
+  constructor(uiManager: UIManager, conversationManager: ConversationManager) {
     this.events = new Map();
     this.triggeredEvents = new Set();
     this.uiManager = uiManager;
+    this.conversationManager = conversationManager;
     this.initializeEvents();
   }
 
   private initializeEvents() {
     // This is where we would load event data from a file
-    this.events.set(1, { id: 1, type: EventType.Conversation, data: { message: 'Hello!' } });
+    this.events.set(1, { id: 1, type: EventType.Conversation, data: { eventId: 'sample_event' } });
     this.events.set(2, { id: 2, type: EventType.TreasureChest, data: { itemId: 'potion', quantity: 1 } });
     this.events.set(3, { id: 3, type: EventType.GatheringPoint, data: { itemId: 'herb', cooldown: 10000 } });
   }
@@ -49,7 +51,14 @@ export class EventManager {
 
     switch (event.type) {
       case EventType.Conversation:
-        this.uiManager.log(event.data.message);
+        this.conversationManager.startConversation(event.data.eventId, () => {
+          const currentNode = this.conversationManager.currentNode;
+          if (currentNode) {
+            this.uiManager.showConversation(currentNode);
+          } else {
+            this.uiManager.hideConversation();
+          }
+        });
         break;
       case EventType.TreasureChest:
         this.uiManager.log(`You found a ${event.data.itemId}!`);

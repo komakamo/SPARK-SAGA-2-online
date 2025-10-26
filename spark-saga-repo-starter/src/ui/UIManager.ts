@@ -1,5 +1,7 @@
 import { InputManager } from '../input/InputManager';
 import { Action } from '../input/InputManager';
+import { ConversationManager } from '../managers/ConversationManager';
+import { EventNode } from '../schemas/event';
 
 export class UIManager {
   private container: HTMLElement;
@@ -9,9 +11,15 @@ export class UIManager {
   private helpDisplay: HTMLElement;
   private logPane: HTMLElement;
   private touchControls: HTMLElement;
+  private conversationOverlay: HTMLElement;
+  private dialogBox: HTMLElement;
+  private dialogText: HTMLElement;
+  private choiceList: HTMLElement;
   private inputManager: InputManager;
+  private conversationManager: ConversationManager;
+  private conversationHistory: string[] = [];
 
-  constructor(inputManager: InputManager) {
+  constructor(inputManager: InputManager, conversationManager: ConversationManager) {
     this.container = document.getElementById('ui-container')!;
     this.header = document.getElementById('ui-header')!;
     this.main = document.getElementById('ui-main')!;
@@ -19,9 +27,20 @@ export class UIManager {
     this.logPane = document.getElementById('log-pane')!;
     this.helpDisplay = document.getElementById('help-display')!;
     this.touchControls = document.getElementById('touch-controls')!;
+    this.conversationOverlay = document.getElementById('conversation-overlay')!;
+    this.dialogBox = document.getElementById('dialog-box')!;
+    this.dialogText = document.getElementById('dialog-text')!;
+    this.choiceList = document.getElementById('choice-list')!;
     this.inputManager = inputManager;
+    this.conversationManager = conversationManager;
 
     this.setupTouchControls();
+
+    this.dialogBox.addEventListener('click', () => {
+      if (this.conversationManager.currentNode?.type === 'dialog') {
+        this.conversationManager.next();
+      }
+    });
   }
 
   public updateHelpDisplay(): void {
@@ -42,6 +61,34 @@ export class UIManager {
     logEntry.textContent = message;
     this.logPane.appendChild(logEntry);
     this.logPane.scrollTop = this.logPane.scrollHeight;
+
+    this.conversationHistory.push(message);
+    if (this.conversationHistory.length > 50) {
+      this.conversationHistory.shift();
+    }
+  }
+
+  public showConversation(node: EventNode) {
+    this.conversationOverlay.hidden = false;
+    if (node.type === 'dialog') {
+      this.dialogText.textContent = node.text; // This should be an i18n key
+      this.choiceList.innerHTML = '';
+    } else if (node.type === 'choice') {
+      this.dialogText.textContent = ''; // Or some prompt
+      this.choiceList.innerHTML = '';
+      node.choices.forEach((choice, index) => {
+        const li = document.createElement('li');
+        const button = document.createElement('button');
+        button.textContent = choice.text; // i18n key
+        button.onclick = () => this.conversationManager.handleChoice(index);
+        li.appendChild(button);
+        this.choiceList.appendChild(li);
+      });
+    }
+  }
+
+  public hideConversation() {
+    this.conversationOverlay.hidden = true;
   }
 
   private setupTouchControls(): void {
@@ -66,6 +113,6 @@ export class UIManager {
     document.getElementById('action-cancel')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.Cancel, true));
     document.getElementById('action-cancel')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.Cancel, false));
     document.getElementById('action-menu')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.Menu, true));
-    document.getElementById('action-menu')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.Menu, false));
+    document.getElementById('action-menu')!.addEventListener('touchend', ()_ => this.inputManager.setActionState(Action.Menu, false));
   }
 }

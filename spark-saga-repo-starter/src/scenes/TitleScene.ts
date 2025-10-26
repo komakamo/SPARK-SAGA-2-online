@@ -8,6 +8,7 @@ export class TitleScene implements Scene {
   private sceneManager: SceneManager;
   public inputManager: InputManager;
   public uiManager: UIManager;
+  private newGameButton: HTMLElement;
 
   constructor(
     sceneManager: SceneManager,
@@ -18,6 +19,8 @@ export class TitleScene implements Scene {
     this.sceneManager = sceneManager;
     this.inputManager = inputManager;
     this.uiManager = uiManager;
+    this.newGameButton = document.getElementById('new-game-button')!;
+    this.newGameButton.addEventListener('click', () => this.sceneManager.changeScene('field'));
   }
 
   enter(): void {

@@ -1,6 +1,7 @@
 import { Scene } from '../scenes/Scene';
 import { InputManager, Action } from '../input/InputManager';
 import { UIManager } from '../ui/UIManager';
+import { ConversationManager } from './ConversationManager';
 
 export class SceneManager {
   private currentScene: Scene | null = null;
@@ -10,10 +11,12 @@ export class SceneManager {
   public isPaused = false;
   private inputManager: InputManager;
   private uiManager: UIManager;
+  public conversationManager: ConversationManager;
 
-  constructor(inputManager: InputManager, uiManager: UIManager) {
+  constructor(inputManager: InputManager, uiManager: UIManager, conversationManager: ConversationManager) {
     this.inputManager = inputManager;
     this.uiManager = uiManager;
+    this.conversationManager = conversationManager;
     this.gameLoop = this.gameLoop.bind(this);
   }
 
