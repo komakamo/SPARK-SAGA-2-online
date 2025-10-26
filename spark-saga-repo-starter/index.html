@@ -14,7 +14,7 @@
         <h1>SPARK SAGA</h1>
       </header>
       <main id="ui-main">
-        <div id="title-scene" hidden>
+        <div id="title-scene">
           <h1>Title Screen</h1>
           <button id="new-game-button">New Game</button>
         </div>
@@ -23,14 +23,13 @@
         </div>
         <div id="battle-scene" hidden>
           <h1>Battle</h1>
-          <button id="victory-button">Victory</button>
-          <button id="escape-button">Escape</button>
-          <button id="gameover-button">Game Over</button>
+          <div id="battle-log-container"></div>
         </div>
         <div id="result-scene" hidden>
           <h1>Result</h1>
           <p>You won!</p>
-          <button id="back-to-field-button">Back to Field</button>
+          <p>Experience Gained: <span id="exp-gained"></span></p>
+          <p>Gold Gained: <span id="gold-gained"></span></p>
         </div>
         <div id="menu-scene" class="overlay" hidden>
           <div class="card">

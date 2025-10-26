@@ -8,6 +8,7 @@ export enum Action {
   Menu,
   TargetPrev,
   TargetNext,
+  Battle,
 }
 
 export class InputManager {
@@ -39,6 +40,7 @@ export class InputManager {
     this.keyMap.set('m', Action.Menu);
     this.keyMap.set('q', Action.TargetPrev);
     this.keyMap.set('e', Action.TargetNext);
+    this.keyMap.set('b', Action.Battle);
   }
 
   private initializeDefaultGamepadMap(): void {

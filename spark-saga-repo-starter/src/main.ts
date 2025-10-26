@@ -13,7 +13,7 @@ const loadingScreen = document.getElementById('loading-screen')!;
 const errorScreen = document.getElementById('error-screen')!;
 const errorMessage = document.getElementById('error-message')!;
 const retryButton = document.getElementById('retry-button')!;
-const mainContent = document.querySelector('.card')!;
+const mainContent = document.getElementById('ui-main')!;
 const devDiagnostics = document.getElementById('dev-diagnostics')!;
 
 async function startGame() {

@@ -60,6 +60,9 @@ export class FieldScene implements Scene {
     if (this.inputManager.isActionJustPressed(Action.Menu)) {
         this.isDebugMode = !this.isDebugMode;
     }
+    if (this.inputManager.isActionJustPressed(Action.Battle)) {
+        this.onEncounter();
+    }
   }
 
   render(): void {
