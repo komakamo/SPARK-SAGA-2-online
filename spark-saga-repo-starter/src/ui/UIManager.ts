@@ -1,3 +1,4 @@
+import { Combatant } from '../combat/Combatant';
 import { InputManager } from '../input/InputManager';
 import { Action } from '../input/InputManager';
 import { ConversationManager } from '../managers/ConversationManager';
@@ -15,6 +16,8 @@ export class UIManager {
   private dialogBox: HTMLElement;
   private dialogText: HTMLElement;
   private choiceList: HTMLElement;
+  private playerStatus: HTMLElement;
+  private enemyStatus: HTMLElement;
   private inputManager: InputManager;
   private conversationManager: ConversationManager;
   private conversationHistory: string[] = [];
@@ -31,6 +34,8 @@ export class UIManager {
     this.dialogBox = document.getElementById('dialog-box')!;
     this.dialogText = document.getElementById('dialog-text')!;
     this.choiceList = document.getElementById('choice-list')!;
+    this.playerStatus = document.getElementById('player-status')!;
+    this.enemyStatus = document.getElementById('enemy-status')!;
     this.inputManager = inputManager;
     this.conversationManager = conversationManager;
 
@@ -89,6 +94,11 @@ export class UIManager {
 
   public hideConversation() {
     this.conversationOverlay.hidden = true;
+  }
+
+  public updatePartyStatus(player: Combatant, enemy: Combatant): void {
+    this.playerStatus.textContent = `Player: HP ${player.hp}/${player.maxHp} | LP ${player.lp}/${player.maxLp} | WP ${player.wp}/${player.maxWp} | JP ${player.jp}/${player.maxJp}`;
+    this.enemyStatus.textContent = `Enemy: HP ${enemy.hp}/${enemy.maxHp} | LP ${enemy.lp}/${enemy.maxLp} | WP ${enemy.wp}/${enemy.maxWp} | JP ${enemy.jp}/${enemy.maxJp}`;
   }
 
   private setupTouchControls(): void {
