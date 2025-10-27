@@ -1,0 +1,12 @@
+{
+  "physical_damage": {
+    "weapon_attack_coefficient": 1.0,
+    "strength_coefficient": 0.7,
+    "defense_factor": 50
+  },
+  "magical_damage": {
+    "staff_correction_coefficient": 1.0,
+    "intelligence_coefficient": 0.9,
+    "magic_defense_factor": 50
+  }
+}
