@@ -29,8 +29,8 @@ export class BattleScene implements Scene {
     this.uiManager = uiManager;
 
     // TODO: Replace with actual data loading
-    this.player = new Combatant(100, 1, 50, 50, 10);
-    this.enemy = new Combatant(80, 1, 30, 30, 8);
+    this.player = new Combatant(100, 1, 50, 50, 10, 20, 15, 10, 0, 0, 0, 12, 10, 0.05);
+    this.enemy = new Combatant(80, 1, 30, 30, 8, 15, 12, 8, 0, 0, 0, 8, 8, 0);
     this.turnOrder = [];
   }
 
@@ -92,12 +92,23 @@ export class BattleScene implements Scene {
   }
 
   private attack(attacker: Combatant, target: Combatant): void {
-    const { revived } = target.takeDamage(10, attacker, 'physical', 'slash');
-    this.log(
-      `${attacker === this.player ? 'Player' : 'Enemy'} attacks ${
-        target === this.player ? 'Player' : 'Enemy'
-      }.`,
+    const { revived, outcome, damage } = target.takeDamage(
+      10,
+      attacker,
+      'physical',
+      'slash',
     );
+    const attackerName = attacker === this.player ? 'Player' : 'Enemy';
+    const targetName = target === this.player ? 'Player' : 'Enemy';
+
+    if (outcome === 'Miss') {
+      this.log(`${attackerName}'s attack missed ${targetName}.`);
+    } else if (outcome === 'Critical') {
+      this.log(`Critical hit! ${attackerName} deals ${damage} damage to ${targetName}.`);
+    } else {
+      this.log(`${attackerName} deals ${damage} damage to ${targetName}.`);
+    }
+
     if (attacker === this.player) {
       attacker.wp -= 5; // Placeholder WP cost
       this.log('Player uses 5 WP.');
