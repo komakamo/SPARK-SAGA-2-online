@@ -92,9 +92,12 @@ export class BattleScene implements Scene {
   }
 
   private attack(attacker: Combatant, target: Combatant): void {
-    const damage = Math.floor(Math.random() * 5 + 5); // Placeholder damage
-    const { revived } = target.takeDamage(damage);
-    this.log(`${attacker === this.player ? 'Player' : 'Enemy'} attacks ${target === this.player ? 'Player' : 'Enemy'} for ${damage} damage.`);
+    const { revived } = target.takeDamage(10, attacker, 'physical', 'slash');
+    this.log(
+      `${attacker === this.player ? 'Player' : 'Enemy'} attacks ${
+        target === this.player ? 'Player' : 'Enemy'
+      }.`,
+    );
     if (attacker === this.player) {
       attacker.wp -= 5; // Placeholder WP cost
       this.log('Player uses 5 WP.');
