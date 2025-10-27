@@ -1,4 +1,6 @@
 import { gameData } from '../data-loader';
+import { StatusEffect as StatusEffectDefinition } from '../schemas/status-effect';
+import { ActiveStatusEffect } from './StatusEffect';
 
 type Resistances = {
   slash?: number;
@@ -9,9 +11,20 @@ type Resistances = {
   lightning?: number;
   holy?: number;
   dark?: number;
+  poison_resistance?: number;
+  bleed_resistance?: number;
+  paralysis_resistance?: number;
+  stun_resistance?: number;
+  sleep_resistance?: number;
+  confusion_resistance?: number;
+  silence_resistance?: number;
+  petrification_resistance?: number;
+  freeze_resistance?: number;
+  burn_resistance?: number;
 };
 
 export class Combatant {
+  public statusEffects: ActiveStatusEffect[];
   public hp: number;
   public maxHp: number;
   public lp: number;
@@ -70,6 +83,58 @@ export class Combatant {
     this.criticalChance = criticalChance;
     this.resistances = resistances;
     this.hasRevived = false;
+    this.statusEffects = [];
+  }
+
+  addStatusEffect(statusEffectDefinition: StatusEffectDefinition): void {
+    // Resistance check
+    const resistance = statusEffectDefinition.resistanceTags.reduce((acc, tag) => {
+      return acc + (this.resistances[tag as keyof Resistances] ?? 0);
+    }, 0);
+
+    if (Math.random() < resistance) {
+      // Resisted!
+      return;
+    }
+
+    const existingEffect = this.statusEffects.find(
+      (se) => se.definition.id === statusEffectDefinition.id,
+    );
+
+    if (existingEffect) {
+      // For now, just refresh the duration.
+      // More complex rules (stacking, ignoring) could be added here.
+      existingEffect.duration = statusEffectDefinition.duration;
+    } else {
+      const newEffect = new ActiveStatusEffect(statusEffectDefinition);
+      this.statusEffects.push(newEffect);
+      newEffect.onApply(this);
+    }
+  }
+
+  canAct(): boolean {
+    return this.statusEffects.every(effect => effect.canAct());
+  }
+
+  isConfused(): boolean {
+    return this.statusEffects.some(effect => effect.isConfused());
+  }
+
+  isSilenced(): boolean {
+    return this.statusEffects.some(effect => effect.isSilenced());
+  }
+
+  updateStatusEffects(): void {
+    const remainingEffects: ActiveStatusEffect[] = [];
+    for (const effect of this.statusEffects) {
+      effect.onTurnEnd(this);
+      if (effect.isExpired()) {
+        effect.onRemove(this);
+      } else {
+        remainingEffects.push(effect);
+      }
+    }
+    this.statusEffects = remainingEffects;
   }
 
   isAlive(): boolean {
@@ -185,5 +250,7 @@ export class Combatant {
     this.wp = this.maxWp;
     this.jp = this.maxJp;
     this.hasRevived = false;
+    this.statusEffects.forEach(effect => effect.onRemove(this));
+    this.statusEffects = [];
   }
 }

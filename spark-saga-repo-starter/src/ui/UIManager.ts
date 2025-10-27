@@ -97,8 +97,14 @@ export class UIManager {
   }
 
   public updatePartyStatus(player: Combatant, enemy: Combatant): void {
-    this.playerStatus.textContent = `Player: HP ${player.hp}/${player.maxHp} | LP ${player.lp}/${player.maxLp} | WP ${player.wp}/${player.maxWp} | JP ${player.jp}/${player.maxJp}`;
-    this.enemyStatus.textContent = `Enemy: HP ${enemy.hp}/${enemy.maxHp} | LP ${enemy.lp}/${enemy.maxLp} | WP ${enemy.wp}/${enemy.maxWp} | JP ${enemy.jp}/${enemy.maxJp}`;
+    this.playerStatus.innerHTML = `Player: HP ${player.hp}/${player.maxHp} | LP ${player.lp}/${player.maxLp} | WP ${player.wp}/${player.maxWp} | JP ${player.jp}/${player.maxJp} ${this.getStatusEffectIcons(player)}`;
+    this.enemyStatus.innerHTML = `Enemy: HP ${enemy.hp}/${enemy.maxHp} | LP ${enemy.lp}/${enemy.maxLp} | WP ${enemy.wp}/${enemy.maxWp} | JP ${enemy.jp}/${enemy.maxJp} ${this.getStatusEffectIcons(enemy)}`;
+  }
+
+  private getStatusEffectIcons(combatant: Combatant): string {
+    return combatant.statusEffects.map(effect =>
+      `<span class="status-effect-icon" title="${effect.definition.name} (${effect.duration})">${effect.definition.id.substring(0, 2).toUpperCase()}</span>`
+    ).join(' ');
   }
 
   private setupTouchControls(): void {
