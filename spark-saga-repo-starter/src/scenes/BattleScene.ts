@@ -3,6 +3,7 @@ import { SceneManager } from '../managers/SceneManager';
 import { InputManager, Action } from '../input/InputManager';
 import { UIManager } from '../ui/UIManager';
 import { Combatant } from '../combat/Combatant';
+import { gameData } from '../data-loader';
 
 export class BattleScene implements Scene {
   private element: HTMLElement;
@@ -92,6 +93,15 @@ export class BattleScene implements Scene {
   }
 
   private attack(attacker: Combatant, target: Combatant): void {
+    if (attacker === this.player) {
+      // For demonstration, let's say the player's attack has a chance to poison.
+      const poisonEffect = gameData.statusEffects.find(se => se.id === 'poison');
+      if (poisonEffect && Math.random() < 0.3) { // 30% chance to poison
+        target.addStatusEffect(poisonEffect);
+        this.log(`${target === this.player ? 'Player' : 'Enemy'} has been poisoned!`);
+      }
+    }
+
     const { revived, outcome, damage } = target.takeDamage(
       10,
       attacker,
@@ -135,28 +145,59 @@ export class BattleScene implements Scene {
 
   private nextTurn(): void {
     if (!this.enemy.isAlive()) {
-      this.log('Enemy defeated!');
-      this.onVictory();
-      return;
+        this.log('Enemy defeated!');
+        this.onVictory();
+        return;
     }
     if (!this.player.isAlive()) {
-      this.log('You have been defeated!');
-      this.onGameOver();
-      return;
+        this.log('You have been defeated!');
+        this.onGameOver();
+        return;
     }
 
     const currentCombatant = this.turnOrder[this.currentTurn];
-    if (currentCombatant === this.player) {
-      this.isPlayerTurn = true;
-      this.log('Your turn.');
-    } else {
-      this.isPlayerTurn = false;
-      this.log('Enemy\'s turn.');
-      // Simple AI: attack the player
-      setTimeout(() => this.attack(this.enemy, this.player), 1000);
+    this.currentTurn = (this.currentTurn + 1) % this.turnOrder.length;
+
+    // Apply status effects at the start of the turn
+    currentCombatant.updateStatusEffects();
+    this.logStatusEffects(currentCombatant);
+
+    if (!currentCombatant.canAct()) {
+        const combatantName = currentCombatant === this.player ? 'Player' : 'Enemy';
+        this.log(`${combatantName} cannot act!`);
+        this.nextTurn();
+        return;
     }
 
-    this.currentTurn = (this.currentTurn + 1) % this.turnOrder.length;
+    if (currentCombatant.isConfused()) {
+        const combatantName = currentCombatant === this.player ? 'Player' : 'Enemy';
+        this.log(`${combatantName} is confused!`);
+        const target = Math.random() < 0.5 ? this.player : this.enemy;
+        this.attack(currentCombatant, target);
+        return;
+    }
+
+    if (currentCombatant === this.player) {
+        this.isPlayerTurn = true;
+        this.log('Your turn.');
+    } else {
+        this.isPlayerTurn = false;
+        this.log("Enemy's turn.");
+        // Simple AI: attack the player
+        setTimeout(() => this.attack(this.enemy, this.player), 1000);
+    }
+  }
+
+  private logStatusEffects(combatant: Combatant): void {
+    const combatantName = combatant === this.player ? 'Player' : 'Enemy';
+    combatant.statusEffects.forEach(effect => {
+      effect.definition.effects.forEach(def => {
+        if (def.type === 'damage_over_time') {
+          this.log(`${combatantName} takes ${def.value} damage from ${effect.definition.name}.`);
+        }
+      });
+    });
+    this.uiManager.updatePartyStatus(this.player, this.enemy);
   }
 
   private calculateTurnOrder(): void {

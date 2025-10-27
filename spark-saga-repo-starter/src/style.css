@@ -141,3 +141,17 @@ button {
   border-radius: 50%;
   font-size: 1.5rem;
 }
+
+.status-effect-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #000;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 24px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 4px;
+  cursor: help;
+}

@@ -1,0 +1,108 @@
+[
+  {
+    "id": "poison",
+    "name": "Poison",
+    "duration": 5,
+    "effects": [
+      {
+        "type": "damage_over_time",
+        "stat": "hp",
+        "value": 10
+      }
+    ],
+    "resistanceTags": ["poison_resistance"]
+  },
+  {
+    "id": "bleed",
+    "name": "Bleed",
+    "duration": 3,
+    "effects": [
+      {
+        "type": "damage_over_time",
+        "stat": "hp",
+        "value": 15
+      }
+    ],
+    "resistanceTags": ["bleed_resistance"]
+  },
+  {
+    "id": "paralysis",
+    "name": "Paralysis",
+    "duration": 2,
+    "effects": [
+      {
+        "type": "stat_change",
+        "stat": "speed",
+        "value": -20
+      }
+    ],
+    "resistanceTags": ["paralysis_resistance"]
+  },
+  {
+    "id": "stun",
+    "name": "Stun",
+    "duration": 1,
+    "effects": [
+      { "type": "prevent_action" }
+    ],
+    "resistanceTags": ["stun_resistance"]
+  },
+  {
+    "id": "sleep",
+    "name": "Sleep",
+    "duration": 3,
+    "effects": [
+      { "type": "prevent_action" }
+    ],
+    "resistanceTags": ["sleep_resistance"]
+  },
+  {
+    "id": "confusion",
+    "name": "Confusion",
+    "duration": 3,
+    "effects": [
+      { "type": "confuse" }
+    ],
+    "resistanceTags": ["confusion_resistance"]
+  },
+  {
+    "id": "silence",
+    "name": "Silence",
+    "duration": 3,
+    "effects": [
+      { "type": "disable_magic" }
+    ],
+    "resistanceTags": ["silence_resistance"]
+  },
+  {
+    "id": "petrification",
+    "name": "Petrification",
+    "duration": 99,
+    "effects": [
+      { "type": "prevent_action" }
+    ],
+    "resistanceTags": ["petrification_resistance"]
+  },
+  {
+    "id": "freeze",
+    "name": "Freeze",
+    "duration": 2,
+    "effects": [
+      { "type": "prevent_action" }
+    ],
+    "resistanceTags": ["freeze_resistance"]
+  },
+  {
+    "id": "burn",
+    "name": "Burn",
+    "duration": 4,
+    "effects": [
+      {
+        "type": "damage_over_time",
+        "stat": "hp",
+        "value": 12
+      }
+    ],
+    "resistanceTags": ["burn_resistance"]
+  }
+]
