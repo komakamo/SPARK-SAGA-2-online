@@ -29,14 +29,15 @@ export class BattleScene implements Scene {
     this.uiManager = uiManager;
 
     // TODO: Replace with actual data loading
-    this.player = new Combatant(100, 10);
-    this.enemy = new Combatant(80, 8);
+    this.player = new Combatant(100, 1, 50, 50, 10);
+    this.enemy = new Combatant(80, 1, 30, 30, 8);
     this.turnOrder = [];
   }
 
   enter(): void {
     this.element.hidden = false;
     this.uiManager.updateHelpDisplay();
+    this.uiManager.updatePartyStatus(this.player, this.enemy);
     this.calculateTurnOrder();
     this.log('A wild enemy appears!');
     this.nextTurn();
@@ -92,8 +93,19 @@ export class BattleScene implements Scene {
 
   private attack(attacker: Combatant, target: Combatant): void {
     const damage = Math.floor(Math.random() * 5 + 5); // Placeholder damage
-    target.takeDamage(damage);
+    const { revived } = target.takeDamage(damage);
     this.log(`${attacker === this.player ? 'Player' : 'Enemy'} attacks ${target === this.player ? 'Player' : 'Enemy'} for ${damage} damage.`);
+    if (attacker === this.player) {
+      attacker.wp -= 5; // Placeholder WP cost
+      this.log('Player uses 5 WP.');
+    } else {
+      attacker.jp -= 5; // Placeholder JP cost
+      this.log('Enemy uses 5 JP.');
+    }
+    this.uiManager.updatePartyStatus(this.player, this.enemy);
+    if (revived) {
+      this.log(`${target === this.player ? 'Player' : 'Enemy'} revived with LP!`);
+    }
     this.nextTurn();
   }
 
