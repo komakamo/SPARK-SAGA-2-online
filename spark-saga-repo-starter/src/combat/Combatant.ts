@@ -27,6 +27,9 @@ export class Combatant {
   public staffCorrection: number;
   public intelligence: number;
   public magicDefense: number;
+  public dexterity: number;
+  public agility: number;
+  public criticalChance: number;
   public resistances: Resistances;
   public hasRevived: boolean;
 
@@ -42,6 +45,9 @@ export class Combatant {
     staffCorrection = 0,
     intelligence = 0,
     magicDefense = 0,
+    dexterity = 0,
+    agility = 0,
+    criticalChance = 0,
     resistances: Resistances = {},
   ) {
     this.maxHp = maxHp;
@@ -59,6 +65,9 @@ export class Combatant {
     this.staffCorrection = staffCorrection;
     this.intelligence = intelligence;
     this.magicDefense = magicDefense;
+    this.dexterity = dexterity;
+    this.agility = agility;
+    this.criticalChance = criticalChance;
     this.resistances = resistances;
     this.hasRevived = false;
   }
@@ -107,6 +116,27 @@ export class Combatant {
     return Math.round(finalDamage);
   }
 
+  calculateHitEvasionAndCritical(
+    attacker: Combatant,
+    baseHitChance = 1.0,
+  ): { outcome: 'Miss' | 'Hit' | 'Critical'; criticalChance: number } {
+    const hitChance =
+      baseHitChance +
+      (attacker.dexterity - this.agility) * 0.02;
+    const clampedHitChance = Math.max(0, Math.min(1, hitChance));
+
+    if (Math.random() > clampedHitChance) {
+      return { outcome: 'Miss', criticalChance: 0 };
+    }
+
+    const criticalChance = Math.min(0.3, attacker.criticalChance);
+    if (Math.random() < criticalChance) {
+      return { outcome: 'Critical', criticalChance };
+    }
+
+    return { outcome: 'Hit', criticalChance };
+  }
+
   applyDamage(damage: number): { revived: boolean } {
     this.hp = Math.max(0, this.hp - damage);
     let revived = false;
@@ -124,9 +154,29 @@ export class Combatant {
     attacker: Combatant,
     type: 'physical' | 'magical',
     damageType: keyof Resistances = 'slash',
-  ): { revived: boolean } {
-    const damage = this.calculateDamage(power, attacker, type, damageType);
-    return this.applyDamage(damage);
+    baseHitChance = 1.0,
+    criticalMultiplier = 1.5,
+  ): {
+    revived: boolean;
+    outcome: 'Miss' | 'Hit' | 'Critical';
+    damage: number;
+  } {
+    const { outcome } = this.calculateHitEvasionAndCritical(
+      attacker,
+      baseHitChance,
+    );
+
+    if (outcome === 'Miss') {
+      return { revived: false, outcome, damage: 0 };
+    }
+
+    let damage = this.calculateDamage(power, attacker, type, damageType);
+    if (outcome === 'Critical') {
+      damage = Math.round(damage * criticalMultiplier);
+    }
+
+    const { revived } = this.applyDamage(damage);
+    return { revived, outcome, damage };
   }
 
   reset(): void {
