@@ -16,6 +16,9 @@ gameData.balance = {
     magic_defense_factor: 50,
   },
 };
+gameData.formation = {
+  byId: new Map(),
+};
 
 // Seed the random number generator for reproducible tests
 const rng = seedrandom('test-seed');

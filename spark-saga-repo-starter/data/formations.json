@@ -1,0 +1,56 @@
+[
+  {
+    "id": "crane_wing",
+    "name": "Crane Wing",
+    "rows": ["B", "F", "B"],
+    "modifiers": {
+      "front": { "attack": 0.1, "defense": -0.1 },
+      "back": { "attack": -0.1, "defense": 0.1 }
+    }
+  },
+  {
+    "id": "tiger_claw",
+    "name": "Tiger Claw",
+    "rows": ["F", "B", "F"],
+    "modifiers": {
+      "front": { "attack": 0.2, "speed": -0.1 },
+      "back": { "attack": -0.2, "speed": 0.1 }
+    }
+  },
+  {
+    "id": "square",
+    "name": "Square",
+    "rows": ["F", "F", "B"],
+    "modifiers": {
+      "front": { "defense": 0.15 },
+      "back": { "defense": -0.15 }
+    }
+  },
+  {
+    "id": "fish_scale",
+    "name": "Fish Scale",
+    "rows": ["F", "B", "B"],
+    "modifiers": {
+      "front": { "attack": 0.1, "defense": 0.1, "speed": -0.1 },
+      "back": { "attack": -0.1, "defense": -0.1, "speed": 0.1 }
+    }
+  },
+  {
+    "id": "wild_geese",
+    "name": "Wild Geese",
+    "rows": ["B", "B", "F"],
+    "modifiers": {
+      "front": { "speed": 0.2, "attack": -0.1 },
+      "back": { "speed": -0.2, "attack": 0.1 }
+    }
+  },
+  {
+    "id": "twin_star",
+    "name": "Twin Star",
+    "rows": ["F", "F", "F"],
+    "modifiers": {
+      "front": { "attack": 0.1, "critical": 0.05 },
+      "back": {}
+    }
+  }
+]

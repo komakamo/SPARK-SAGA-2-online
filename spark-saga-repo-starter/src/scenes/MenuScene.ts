@@ -18,6 +18,10 @@ export class MenuScene implements Scene {
     this.sceneManager = sceneManager;
     this.inputManager = inputManager;
     this.uiManager = uiManager;
+
+    document.getElementById('formation-button')!.addEventListener('click', () => {
+      this.sceneManager.openOverlay('formation');
+    });
   }
 
   enter(): void {

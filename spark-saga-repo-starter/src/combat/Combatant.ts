@@ -45,6 +45,8 @@ export class Combatant {
   public criticalChance: number;
   public resistances: Resistances;
   public hasRevived: boolean;
+  public formationId: string;
+  public formationPosition: 'F' | 'B';
 
   constructor(
     maxHp: number,
@@ -62,6 +64,8 @@ export class Combatant {
     agility = 0,
     criticalChance = 0,
     resistances: Resistances = {},
+    formationId: string = 'square', // Default formation
+    formationPosition: 'F' | 'B' = 'F', // Default position
   ) {
     this.maxHp = maxHp;
     this.hp = maxHp;
@@ -84,6 +88,26 @@ export class Combatant {
     this.resistances = resistances;
     this.hasRevived = false;
     this.statusEffects = [];
+    this.formationId = formationId;
+    this.formationPosition = formationPosition;
+  }
+
+  private get formationModifiers() {
+    const formation = gameData.formation.byId.get(this.formationId);
+    if (!formation) return null;
+
+    const row = this.formationPosition === 'F' ? 'front' : 'back';
+    return formation.modifiers[row];
+  }
+
+  get finalSpeed(): number {
+    const mods = this.formationModifiers;
+    return this.speed * (1 + (mods?.speed || 0));
+  }
+
+  get finalCriticalChance(): number {
+    const mods = this.formationModifiers;
+    return this.criticalChance + (mods?.critical || 0);
   }
 
   addStatusEffect(statusEffectDefinition: StatusEffectDefinition): void {
@@ -150,6 +174,18 @@ export class Combatant {
     const balance = gameData.balance;
     let baseDamage: number;
     let finalDamage: number;
+    let defense = this.defense;
+
+    const attackerMods = attacker.formationModifiers;
+    if (attackerMods?.attack) {
+        power *= 1 + attackerMods.attack;
+    }
+
+    const defenderMods = this.formationModifiers;
+    if (defenderMods?.defense) {
+        defense *= 1 + defenderMods.defense;
+    }
+
 
     if (type === 'physical') {
       const pCoeff = balance.physical_damage;
@@ -159,7 +195,7 @@ export class Combatant {
         power;
       finalDamage =
         baseDamage *
-        (1 - this.defense / (this.defense + pCoeff.defense_factor));
+        (1 - defense / (defense + pCoeff.defense_factor));
     } else {
       const mCoeff = balance.magical_damage;
       baseDamage =
@@ -194,7 +230,7 @@ export class Combatant {
       return { outcome: 'Miss', criticalChance: 0 };
     }
 
-    const criticalChance = Math.min(0.3, attacker.criticalChance);
+    const criticalChance = Math.min(0.3, attacker.finalCriticalChance);
     if (Math.random() < criticalChance) {
       return { outcome: 'Critical', criticalChance };
     }
