@@ -7,6 +7,7 @@ import { FieldScene } from './scenes/FieldScene';
 import { BattleScene } from './scenes/BattleScene';
 import { ResultScene } from './scenes/ResultScene';
 import { MenuScene } from './scenes/MenuScene';
+import { FormationScene } from './scenes/FormationScene';
 import { loadGameData, gameData } from './data-loader';
 
 const loadingScreen = document.getElementById('loading-screen')!;
@@ -55,6 +56,7 @@ async function startGame() {
   sceneManager.addScene('battle', new BattleScene(sceneManager, inputManager, uiManager));
   sceneManager.addScene('result', new ResultScene(sceneManager, inputManager, uiManager));
   sceneManager.addScene('menu', new MenuScene(sceneManager, inputManager, uiManager));
+  sceneManager.addScene('formation', new FormationScene(sceneManager, inputManager, uiManager));
   sceneManager.start('title');
 
   // Expose sceneManager to the window for debugging
