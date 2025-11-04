@@ -1,0 +1,11 @@
+[
+  {
+    "id": "starter_shop",
+    "name": "Frontier Outfitter",
+    "items": [
+      { "id": "potion", "type": "item", "price": 30 },
+      { "id": "iron_sword", "type": "weapon", "price": 120 },
+      { "id": "leather_armor", "type": "armor", "price": 90 }
+    ]
+  }
+]

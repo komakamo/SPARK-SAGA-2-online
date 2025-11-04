@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sample_quest",
+    "name": "Herbal Remedy",
+    "description": "Collect fresh herbs for the town healer.",
+    "rewards": {
+      "items": [
+        { "id": "potion", "quantity": 2 }
+      ]
+    }
+  }
+]

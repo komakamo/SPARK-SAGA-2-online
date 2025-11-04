@@ -1,0 +1,8 @@
+{
+  "sample_event.start": "旅人が助けを求めている。",
+  "sample_event.choice_a": "ポーションを渡す",
+  "sample_event.choice_b": "後で手伝うと約束する",
+  "sample_event.end": "旅人は礼を述べて去っていった。",
+  "ui.battle.player_turn": "あなたのターンです。",
+  "ui.battle.enemy_turn": "敵のターンです。"
+}

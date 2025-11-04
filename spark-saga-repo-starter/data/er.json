@@ -1,0 +1,18 @@
+{
+  "effects": {
+    "starter_training": [
+      {
+        "target_id": "iron_sword",
+        "effect_type": "attack_bonus",
+        "value": 2
+      }
+    ],
+    "healers_request": [
+      {
+        "target_id": "sample_quest",
+        "effect_type": "quest_reward_bonus",
+        "value": { "extra_items": [{ "id": "potion", "quantity": 1 }] }
+      }
+    ]
+  }
+}

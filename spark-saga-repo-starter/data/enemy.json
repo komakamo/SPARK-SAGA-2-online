@@ -1,0 +1,22 @@
+[
+  {
+    "id": "forest_wolf",
+    "name": "Forest Wolf",
+    "description": "A hungry wolf prowling the outskirts of the town.",
+    "level": 2,
+    "hp": 60,
+    "attack": 14,
+    "defense": 6,
+    "skills": ["gust_slash"]
+  },
+  {
+    "id": "ember_imp",
+    "name": "Ember Imp",
+    "description": "A mischievous spirit that throws fireballs at travelers.",
+    "level": 3,
+    "hp": 55,
+    "attack": 12,
+    "defense": 5,
+    "skills": ["flame"]
+  }
+]

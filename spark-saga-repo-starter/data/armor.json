@@ -1,0 +1,14 @@
+[
+  {
+    "id": "leather_armor",
+    "name": "Leather Armor",
+    "description": "Lightweight armor offering basic protection.",
+    "defense": 8
+  },
+  {
+    "id": "bronze_shield",
+    "name": "Bronze Shield",
+    "description": "A sturdy shield that guards against attacks.",
+    "defense": 10
+  }
+]

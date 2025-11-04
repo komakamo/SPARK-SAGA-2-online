@@ -1,0 +1,14 @@
+[
+  {
+    "id": "iron_sword",
+    "name": "Iron Sword",
+    "description": "A reliable blade for new adventurers.",
+    "attack": 12
+  },
+  {
+    "id": "oak_staff",
+    "name": "Oak Staff",
+    "description": "A simple staff that channels magical energy.",
+    "attack": 8
+  }
+]
