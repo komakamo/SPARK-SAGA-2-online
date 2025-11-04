@@ -5,47 +5,49 @@ import { ConversationManager } from '../managers/ConversationManager';
 import { EventNode } from '../schemas/event';
 
 export class UIManager {
-  private container: HTMLElement;
-  private header: HTMLElement;
-  private main: HTMLElement;
-  private footer: HTMLElement;
-  private helpDisplay: HTMLElement;
-  private logPane: HTMLElement;
-  private touchControls: HTMLElement;
-  private conversationOverlay: HTMLElement;
-  private dialogBox: HTMLElement;
-  private dialogText: HTMLElement;
-  private choiceList: HTMLElement;
-  private playerStatus: HTMLElement;
-  private enemyStatus: HTMLElement;
+  private container: HTMLElement | null;
+  private header: HTMLElement | null;
+  private main: HTMLElement | null;
+  private footer: HTMLElement | null;
+  private helpDisplay: HTMLElement | null;
+  private logPane: HTMLElement | null;
+  private touchControls: HTMLElement | null;
+  private conversationOverlay: HTMLElement | null;
+  private dialogBox: HTMLElement | null;
+  private dialogText: HTMLElement | null;
+  private choiceList: HTMLElement | null;
+  private playerStatus: HTMLElement | null;
+  private enemyStatus: HTMLElement | null;
   private inputManager: InputManager;
   private conversationManager: ConversationManager;
   private conversationHistory: string[] = [];
 
   constructor(inputManager: InputManager, conversationManager: ConversationManager) {
-    this.container = document.getElementById('ui-container')!;
-    this.header = document.getElementById('ui-header')!;
-    this.main = document.getElementById('ui-main')!;
-    this.footer = document.getElementById('ui-footer')!;
-    this.logPane = document.getElementById('log-pane')!;
-    this.helpDisplay = document.getElementById('help-display')!;
-    this.touchControls = document.getElementById('touch-controls')!;
-    this.conversationOverlay = document.getElementById('conversation-overlay')!;
-    this.dialogBox = document.getElementById('dialog-box')!;
-    this.dialogText = document.getElementById('dialog-text')!;
-    this.choiceList = document.getElementById('choice-list')!;
-    this.playerStatus = document.getElementById('player-status')!;
-    this.enemyStatus = document.getElementById('enemy-status')!;
+    this.container = this.getElementById('ui-container');
+    this.header = this.getElementById('ui-header');
+    this.main = this.getElementById('ui-main');
+    this.footer = this.getElementById('ui-footer');
+    this.logPane = this.getElementById('log-pane');
+    this.helpDisplay = this.getElementById('help-display');
+    this.touchControls = this.getElementById('touch-controls');
+    this.conversationOverlay = this.getElementById('conversation-overlay');
+    this.dialogBox = this.getElementById('dialog-box');
+    this.dialogText = this.getElementById('dialog-text');
+    this.choiceList = this.getElementById('choice-list');
+    this.playerStatus = this.getElementById('player-status');
+    this.enemyStatus = this.getElementById('enemy-status');
     this.inputManager = inputManager;
     this.conversationManager = conversationManager;
 
     this.setupTouchControls();
 
-    this.dialogBox.addEventListener('click', () => {
-      if (this.conversationManager.currentNode?.type === 'dialog') {
-        this.conversationManager.next();
-      }
-    });
+    if (this.dialogBox) {
+      this.dialogBox.addEventListener('click', () => {
+        if (this.conversationManager.currentNode?.type === 'dialog') {
+          this.conversationManager.next();
+        }
+      });
+    }
   }
 
   public updateHelpDisplay(): void {
@@ -58,10 +60,18 @@ export class UIManager {
     } else {
       helpText = 'Touch: D-Pad, A, B, M';
     }
+    if (!this.helpDisplay) {
+      console.warn('[UIManager] Help display element is missing.');
+      return;
+    }
     this.helpDisplay.textContent = helpText;
   }
 
   public log(message: string): void {
+    if (!this.logPane) {
+      console.warn('[UIManager] Log pane element is missing.');
+      return;
+    }
     const logEntry = document.createElement('p');
     logEntry.textContent = message;
     this.logPane.appendChild(logEntry);
@@ -74,6 +84,10 @@ export class UIManager {
   }
 
   public showConversation(node: EventNode) {
+    if (!this.conversationOverlay || !this.dialogText || !this.choiceList) {
+      console.warn('[UIManager] Conversation elements are missing.');
+      return;
+    }
     this.conversationOverlay.hidden = false;
     if (node.type === 'dialog') {
       this.dialogText.textContent = node.text; // This should be an i18n key
@@ -93,12 +107,21 @@ export class UIManager {
   }
 
   public hideConversation() {
+    if (!this.conversationOverlay) {
+      console.warn('[UIManager] Conversation overlay element is missing.');
+      return;
+    }
     this.conversationOverlay.hidden = true;
   }
 
   public updatePartyStatus(player: Combatant, enemy: Combatant): void {
-    this.playerStatus.innerHTML = `Player: HP ${player.hp}/${player.maxHp} | LP ${player.lp}/${player.maxLp} | WP ${player.wp}/${player.maxWp} | JP ${player.jp}/${player.maxJp} ${this.getStatusEffectIcons(player)}`;
-    this.enemyStatus.innerHTML = `Enemy: HP ${enemy.hp}/${enemy.maxHp} | LP ${enemy.lp}/${enemy.maxLp} | WP ${enemy.wp}/${enemy.maxWp} | JP ${enemy.jp}/${enemy.maxJp} ${this.getStatusEffectIcons(enemy)}`;
+    if (!this.playerStatus || !this.enemyStatus) {
+      console.warn('[UIManager] Status panel elements are missing.');
+      return;
+    }
+
+    this.playerStatus.innerHTML = `<strong>Player</strong><span>HP ${player.hp}/${player.maxHp} | LP ${player.lp}/${player.maxLp} | WP ${player.wp}/${player.maxWp} | JP ${player.jp}/${player.maxJp}</span><span class="status-effects">${this.getStatusEffectIcons(player)}</span>`;
+    this.enemyStatus.innerHTML = `<strong>Enemy</strong><span>HP ${enemy.hp}/${enemy.maxHp} | LP ${enemy.lp}/${enemy.maxLp} | WP ${enemy.wp}/${enemy.maxWp} | JP ${enemy.jp}/${enemy.maxJp}</span><span class="status-effects">${this.getStatusEffectIcons(enemy)}</span>`;
   }
 
   private getStatusEffectIcons(combatant: Combatant): string {
@@ -108,27 +131,44 @@ export class UIManager {
   }
 
   private setupTouchControls(): void {
+    const touchControls = this.touchControls;
+    if (!touchControls) {
+      console.warn('[UIManager] Touch controls container is missing.');
+      return;
+    }
+
     if ('ontouchstart' in window) {
-      this.touchControls.hidden = false;
+      touchControls.hidden = false;
       this.inputManager.setActiveDevice('touch');
     }
 
     // D-Pad
-    document.getElementById('d-pad-up')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.MoveUp, true));
-    document.getElementById('d-pad-up')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.MoveUp, false));
-    document.getElementById('d-pad-down')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.MoveDown, true));
-    document.getElementById('d-pad-down')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.MoveDown, false));
-    document.getElementById('d-pad-left')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.MoveLeft, true));
-    document.getElementById('d-pad-left')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.MoveLeft, false));
-    document.getElementById('d-pad-right')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.MoveRight, true));
-    document.getElementById('d-pad-right')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.MoveRight, false));
+    this.bindTouchControlButton('d-pad-up', Action.MoveUp);
+    this.bindTouchControlButton('d-pad-down', Action.MoveDown);
+    this.bindTouchControlButton('d-pad-left', Action.MoveLeft);
+    this.bindTouchControlButton('d-pad-right', Action.MoveRight);
 
     // Action buttons
-    document.getElementById('action-confirm')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.Confirm, true));
-    document.getElementById('action-confirm')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.Confirm, false));
-    document.getElementById('action-cancel')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.Cancel, true));
-    document.getElementById('action-cancel')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.Cancel, false));
-    document.getElementById('action-menu')!.addEventListener('touchstart', () => this.inputManager.setActionState(Action.Menu, true));
-    document.getElementById('action-menu')!.addEventListener('touchend', () => this.inputManager.setActionState(Action.Menu, false));
+    this.bindTouchControlButton('action-confirm', Action.Confirm);
+    this.bindTouchControlButton('action-cancel', Action.Cancel);
+    this.bindTouchControlButton('action-menu', Action.Menu);
+  }
+
+  private getElementById<T extends HTMLElement>(id: string): T | null {
+    const element = document.getElementById(id) as T | null;
+    if (!element) {
+      console.warn(`[UIManager] Element with id "${id}" was not found.`);
+    }
+    return element;
+  }
+
+  private bindTouchControlButton(id: string, action: Action): void {
+    const button = this.getElementById<HTMLButtonElement>(id);
+    if (!button) {
+      console.warn(`[UIManager] Touch control button "${id}" is missing.`);
+      return;
+    }
+    button.addEventListener('touchstart', () => this.inputManager.setActionState(action, true));
+    button.addEventListener('touchend', () => this.inputManager.setActionState(action, false));
   }
 }
