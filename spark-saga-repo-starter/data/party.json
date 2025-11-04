@@ -1,0 +1,77 @@
+[
+  {
+    "id": "frontier_scouts",
+    "name": "Frontier Scouts",
+    "formation": "desert_lance",
+    "members": [
+      {
+        "id": "hero",
+        "name": "アルベルト",
+        "formationPosition": "F",
+        "stats": {
+          "maxHp": 120,
+          "maxLp": 7,
+          "maxWp": 35,
+          "maxJp": 12,
+          "speed": 11,
+          "weaponAttack": 16,
+          "strength": 14,
+          "defense": 9,
+          "staffCorrection": 4,
+          "intelligence": 8,
+          "magicDefense": 6,
+          "dexterity": 12,
+          "agility": 11,
+          "criticalChance": 0.05
+        },
+        "resistances": {
+          "fire": 0.9,
+          "slash": 0.9
+        },
+        "equipment": {
+          "weapon": "iron_sword",
+          "armor": "leather_armor"
+        },
+        "commands": [
+          { "id": "attack", "name": "通常攻撃", "type": "attack" },
+          { "id": "guard", "name": "防御", "type": "defend" },
+          { "id": "tech", "name": "技", "type": "skill", "skills": ["gust_slash"] }
+        ]
+      },
+      {
+        "id": "mage",
+        "name": "アイシャ",
+        "formationPosition": "B",
+        "stats": {
+          "maxHp": 95,
+          "maxLp": 6,
+          "maxWp": 28,
+          "maxJp": 18,
+          "speed": 10,
+          "weaponAttack": 11,
+          "strength": 9,
+          "defense": 7,
+          "staffCorrection": 12,
+          "intelligence": 15,
+          "magicDefense": 11,
+          "dexterity": 10,
+          "agility": 9,
+          "criticalChance": 0.03
+        },
+        "resistances": {
+          "fire": 0.8,
+          "ice": 1.1
+        },
+        "equipment": {
+          "weapon": "oak_staff",
+          "armor": "bronze_shield"
+        },
+        "commands": [
+          { "id": "attack", "name": "通常攻撃", "type": "attack" },
+          { "id": "guard", "name": "防御", "type": "defend" },
+          { "id": "spell", "name": "術", "type": "skill", "skills": ["flame"] }
+        ]
+      }
+    ]
+  }
+]

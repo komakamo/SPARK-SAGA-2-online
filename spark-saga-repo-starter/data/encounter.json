@@ -1,0 +1,34 @@
+[
+  {
+    "id": "tutorial_wolf_pack",
+    "name": "森の狼退治",
+    "playerPartyId": "frontier_scouts",
+    "enemies": [
+      {
+        "id": "wolf_a",
+        "enemyId": "forest_wolf",
+        "formationPosition": "F"
+      },
+      {
+        "id": "wolf_b",
+        "enemyId": "forest_wolf",
+        "formationPosition": "B"
+      },
+      {
+        "id": "imp",
+        "enemyId": "ember_imp",
+        "formationPosition": "B"
+      }
+    ],
+    "rewards": {
+      "experience": 24,
+      "gold": 12,
+      "items": [
+        { "id": "potion", "quantity": 1 }
+      ]
+    },
+    "questProgress": [
+      { "questId": "sample_quest", "state": "completed" }
+    ]
+  }
+]

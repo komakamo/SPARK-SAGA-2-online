@@ -4,9 +4,25 @@
     "name": "Forest Wolf",
     "description": "A hungry wolf prowling the outskirts of the town.",
     "level": 2,
-    "hp": 60,
-    "attack": 14,
-    "defense": 6,
+    "stats": {
+      "maxHp": 60,
+      "maxLp": 0,
+      "maxWp": 20,
+      "maxJp": 0,
+      "speed": 9,
+      "weaponAttack": 14,
+      "strength": 12,
+      "defense": 6,
+      "staffCorrection": 0,
+      "intelligence": 6,
+      "magicDefense": 5,
+      "dexterity": 10,
+      "agility": 9,
+      "criticalChance": 0.02
+    },
+    "resistances": {
+      "fire": 1.2
+    },
     "skills": ["gust_slash"]
   },
   {
@@ -14,9 +30,26 @@
     "name": "Ember Imp",
     "description": "A mischievous spirit that throws fireballs at travelers.",
     "level": 3,
-    "hp": 55,
-    "attack": 12,
-    "defense": 5,
+    "stats": {
+      "maxHp": 55,
+      "maxLp": 0,
+      "maxWp": 18,
+      "maxJp": 16,
+      "speed": 10,
+      "weaponAttack": 10,
+      "strength": 9,
+      "defense": 5,
+      "staffCorrection": 12,
+      "intelligence": 14,
+      "magicDefense": 8,
+      "dexterity": 11,
+      "agility": 10,
+      "criticalChance": 0.03
+    },
+    "resistances": {
+      "fire": 0.5,
+      "ice": 1.1
+    },
     "skills": ["flame"]
   }
 ]

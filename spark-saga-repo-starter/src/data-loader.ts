@@ -20,6 +20,7 @@ export const gameData: { [key: string]: any } = {};
 const DATA_FILES = [
   'armor.json',
   'balance.json',
+  'encounter.json',
   'enemy.json',
   'er.json',
   'event.json',
@@ -28,6 +29,7 @@ const DATA_FILES = [
   'status-effect.json',
   'item.json',
   'loot_table.json',
+  'party.json',
   'quest.json',
   'shop.json',
   'skill.json',
@@ -93,8 +95,10 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
     'armor.json': async () => (await import('./schemas/armor')).armorsSchema,
     'item.json': async () => (await import('./schemas/item')).itemsSchema,
     'enemy.json': async () => (await import('./schemas/enemy')).enemiesSchema,
+    'encounter.json': async () => (await import('./schemas/encounter')).encountersSchema,
     'formation.json': async () => (await import('./schemas/formation')).formationsSchema,
     'event.json': async () => (await import('./schemas/event')).eventsSchema,
+    'party.json': async () => (await import('./schemas/party')).partiesSchema,
     'quest.json': async () => (await import('./schemas/quest')).questsSchema,
     'shop.json': async () => (await import('./schemas/shop')).shopsSchema,
     'faction.json': async () => (await import('./schemas/faction')).factionsSchema,
@@ -142,6 +146,25 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
   const itemIds = new Set(rawData['item.json'].map((i: any) => i.id));
   const questIds = new Set(rawData['quest.json'].map((q: any) => q.id));
   const balanceAffixKeys = new Set(rawData['balance.json'].affix_keys ?? []);
+  const formationIds = new Set(rawData['formation.json'].map((f: any) => f.id));
+  const statusEffectIds = new Set(rawData['status-effect.json'].map((se: any) => se.id));
+  const lootTableIds = new Set(rawData['loot_table.json'].map((lt: any) => lt.id));
+  const partyIds = rawData['party.json']
+    ? new Set(rawData['party.json'].map((p: any) => p.id))
+    : new Set<string>();
+
+  rawData['skill.json'].forEach((skill: any) => {
+    skill.statusEffects?.forEach((statusId: string) => {
+      if (!statusEffectIds.has(statusId)) {
+        logs.push({
+          level: 'WARN',
+          code: 'DANGLING_STATUS_REFERENCE',
+          id: skill.id,
+          msg: `Skill "${skill.id}" references non-existent status effect "${statusId}"`,
+        });
+      }
+    });
+  });
 
   // Check enemy skills
   rawData['enemy.json'].forEach((enemy: any) => {
@@ -158,6 +181,124 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
       });
     }
   });
+
+  if (rawData['party.json']) {
+    rawData['party.json'].forEach((party: any) => {
+      if (!formationIds.has(party.formation)) {
+        logs.push({
+          level: 'WARN',
+          code: 'DANGLING_FORMATION_REFERENCE',
+          id: party.id,
+          msg: `Party "${party.id}" references non-existent formation "${party.formation}"`,
+        });
+      }
+
+      party.members.forEach((member: any) => {
+        if (member.equipment?.weapon && !weaponIds.has(member.equipment.weapon)) {
+          logs.push({
+            level: 'WARN',
+            code: 'DANGLING_WEAPON_REFERENCE',
+            id: member.id,
+            msg: `Party member "${member.id}" references missing weapon "${member.equipment.weapon}"`,
+          });
+        }
+
+        if (member.equipment?.armor && !armorIds.has(member.equipment.armor)) {
+          logs.push({
+            level: 'WARN',
+            code: 'DANGLING_ARMOR_REFERENCE',
+            id: member.id,
+            msg: `Party member "${member.id}" references missing armor "${member.equipment.armor}"`,
+          });
+        }
+
+        member.commands?.forEach((command: any) => {
+          if (command.type === 'skill' && command.skills) {
+            command.skills.forEach((skillId: string) => {
+              if (!skillIds.has(skillId)) {
+                logs.push({
+                  level: 'WARN',
+                  code: 'DANGLING_SKILL_REFERENCE',
+                  id: member.id,
+                  msg: `Party member "${member.id}" references non-existent skill "${skillId}"`,
+                });
+              }
+            });
+          }
+
+          if (command.type === 'item' && command.items) {
+            command.items.forEach((item: any) => {
+              if (!itemIds.has(item.id)) {
+                logs.push({
+                  level: 'WARN',
+                  code: 'DANGLING_ITEM_REFERENCE',
+                  id: member.id,
+                  msg: `Party member "${member.id}" references non-existent item "${item.id}"`,
+                });
+              }
+            });
+          }
+        });
+      });
+    });
+  }
+
+  if (rawData['encounter.json']) {
+    rawData['encounter.json'].forEach((encounter: any) => {
+      if (encounter.playerPartyId && !partyIds.has(encounter.playerPartyId)) {
+        logs.push({
+          level: 'WARN',
+          code: 'DANGLING_PARTY_REFERENCE',
+          id: encounter.id,
+          msg: `Encounter "${encounter.id}" references non-existent party "${encounter.playerPartyId}"`,
+        });
+      }
+
+      encounter.enemies.forEach((entry: any) => {
+        if (!rawData['enemy.json'].some((enemy: any) => enemy.id === entry.enemyId)) {
+          logs.push({
+            level: 'WARN',
+            code: 'DANGLING_ENEMY_REFERENCE',
+            id: encounter.id,
+            msg: `Encounter "${encounter.id}" references non-existent enemy "${entry.enemyId}"`,
+          });
+        }
+      });
+
+      encounter.rewards?.items?.forEach((item: any) => {
+        if (!itemIds.has(item.id)) {
+          logs.push({
+            level: 'WARN',
+            code: 'DANGLING_ITEM_REFERENCE',
+            id: encounter.id,
+            msg: `Encounter "${encounter.id}" reward references non-existent item "${item.id}"`,
+          });
+        }
+      });
+
+      encounter.rewards?.lootTables?.forEach((tableId: string) => {
+        if (!lootTableIds.has(tableId)) {
+          logs.push({
+            level: 'WARN',
+            code: 'DANGLING_LOOT_TABLE_REFERENCE',
+            id: encounter.id,
+            msg: `Encounter "${encounter.id}" references non-existent loot table "${tableId}"`,
+          });
+        }
+      });
+
+      encounter.questProgress?.forEach((progress: any) => {
+        if (!questIds.has(progress.questId)) {
+          logs.push({
+            level: 'WARN',
+            code: 'DANGLING_QUEST_REFERENCE',
+            id: encounter.id,
+            msg: `Encounter "${encounter.id}" references non-existent quest "${progress.questId}"`,
+          });
+        }
+      });
+    });
+  }
 
   // Check weapon op
   rawData['weapon.json'].forEach((weapon: any) => {

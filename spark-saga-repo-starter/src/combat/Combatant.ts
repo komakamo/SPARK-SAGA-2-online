@@ -9,6 +9,9 @@ type Resistances = {
   fire?: number;
   ice?: number;
   lightning?: number;
+  wind?: number;
+  earth?: number;
+  water?: number;
   holy?: number;
   dark?: number;
   poison_resistance?: number;
@@ -47,6 +50,8 @@ export class Combatant {
   public hasRevived: boolean;
   public formationId: string;
   public formationPosition: 'F' | 'B';
+  private guarding: boolean;
+  public name: string;
 
   constructor(
     maxHp: number,
@@ -90,6 +95,13 @@ export class Combatant {
     this.statusEffects = [];
     this.formationId = formationId;
     this.formationPosition = formationPosition;
+    this.guarding = false;
+    this.name = 'Unknown';
+  }
+
+  beginTurn(): ActiveStatusEffect[] {
+    this.guarding = false;
+    return this.updateStatusEffects();
   }
 
   private get formationModifiers() {
@@ -136,6 +148,29 @@ export class Combatant {
     }
   }
 
+  startGuarding(): void {
+    this.guarding = true;
+  }
+
+  isGuarding(): boolean {
+    return this.guarding;
+  }
+
+  setName(name: string): void {
+    this.name = name;
+  }
+
+  spendResources(cost: { wp?: number; jp?: number }): boolean {
+    const requiredWp = cost.wp ?? 0;
+    const requiredJp = cost.jp ?? 0;
+    if (this.wp < requiredWp || this.jp < requiredJp) {
+      return false;
+    }
+    this.wp -= requiredWp;
+    this.jp -= requiredJp;
+    return true;
+  }
+
   canAct(): boolean {
     return this.statusEffects.every(effect => effect.canAct());
   }
@@ -148,9 +183,11 @@ export class Combatant {
     return this.statusEffects.some(effect => effect.isSilenced());
   }
 
-  updateStatusEffects(): void {
+  updateStatusEffects(): ActiveStatusEffect[] {
     const remainingEffects: ActiveStatusEffect[] = [];
+    const triggeredEffects: ActiveStatusEffect[] = [];
     for (const effect of this.statusEffects) {
+      triggeredEffects.push(effect);
       effect.onTurnEnd(this);
       if (effect.isExpired()) {
         effect.onRemove(this);
@@ -159,6 +196,7 @@ export class Combatant {
       }
     }
     this.statusEffects = remainingEffects;
+    return triggeredEffects;
   }
 
   isAlive(): boolean {
@@ -239,7 +277,8 @@ export class Combatant {
   }
 
   applyDamage(damage: number): { revived: boolean } {
-    this.hp = Math.max(0, this.hp - damage);
+    const mitigatedDamage = this.guarding ? Math.round(damage * 0.6) : damage;
+    this.hp = Math.max(0, this.hp - mitigatedDamage);
     let revived = false;
     if (this.hp === 0 && this.lp > 0 && !this.hasRevived) {
       this.lp -= 1;
@@ -288,5 +327,6 @@ export class Combatant {
     this.hasRevived = false;
     this.statusEffects.forEach(effect => effect.onRemove(this));
     this.statusEffects = [];
+    this.guarding = false;
   }
 }

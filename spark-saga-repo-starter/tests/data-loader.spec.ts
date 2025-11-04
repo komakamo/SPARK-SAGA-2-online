@@ -33,6 +33,9 @@ describe('loadGameData', () => {
       expect(gameData.weapon.byId.get('iron_sword')?.name).toBe('Iron Sword');
       expect(gameData.formation.byId.size).toBeGreaterThan(0);
       expect(gameData.statusEffects.all.length).toBeGreaterThan(0);
+      expect(gameData.party.byId.get('frontier_scouts')?.members).toHaveLength(2);
+      expect(gameData.encounter.byId.get('tutorial_wolf_pack')?.enemies).toHaveLength(3);
+      expect(gameData.skill.byId.get('flame')?.statusEffects).toContain('burn');
       expect(gameData['i18n_en']).toBeDefined();
       expect(gameData['i18n_ja']).toBeDefined();
     } finally {
