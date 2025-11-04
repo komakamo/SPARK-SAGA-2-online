@@ -27,6 +27,11 @@
             <section id="player-status" class="status-card" aria-live="polite"></section>
             <section id="enemy-status" class="status-card" aria-live="polite"></section>
           </div>
+          <div id="battle-command-panels">
+            <section id="command-menu" class="command-panel" aria-label="Commands"></section>
+            <section id="skill-menu" class="command-panel" aria-label="Skills" hidden></section>
+            <section id="target-menu" class="command-panel" aria-label="Targets" hidden></section>
+          </div>
           <div id="battle-log-container"></div>
         </div>
         <div id="result-scene" hidden>
@@ -34,6 +39,14 @@
           <p>You won!</p>
           <p>Experience Gained: <span id="exp-gained"></span></p>
           <p>Gold Gained: <span id="gold-gained"></span></p>
+          <div>
+            <h2>Loot</h2>
+            <ul id="loot-list" class="result-list"></ul>
+          </div>
+          <div>
+            <h2>Quest Progress</h2>
+            <ul id="quest-progress-list" class="result-list"></ul>
+          </div>
         </div>
         <div id="menu-scene" class="overlay" hidden>
           <div class="card">

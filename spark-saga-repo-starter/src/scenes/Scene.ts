@@ -4,7 +4,7 @@ import { UIManager } from '../ui/UIManager';
 export interface Scene {
   inputManager: InputManager;
   uiManager: UIManager;
-  enter(): void;
+  enter(params?: unknown): void | Promise<void>;
   exit(): void;
   update(deltaTime: number): void;
   render(): void;

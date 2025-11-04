@@ -6,12 +6,14 @@ import { ConversationManager } from './ConversationManager';
 export class SceneManager {
   private currentScene: Scene | null = null;
   private pausedScene: Scene | null = null;
+  private pausedSceneName: string | null = null;
   private scenes: Map<string, Scene> = new Map();
   private lastTime: number = 0;
   public isPaused = false;
   private inputManager: InputManager;
   private uiManager: UIManager;
   public conversationManager: ConversationManager;
+  private currentSceneName: string | null = null;
 
   constructor(inputManager: InputManager, uiManager: UIManager, conversationManager: ConversationManager) {
     this.inputManager = inputManager;
@@ -25,7 +27,7 @@ export class SceneManager {
   }
 
   // For regular scene transitions (e.g., Title -> Field)
-  changeScene(name: string): void {
+  changeScene(name: string, params?: unknown): void {
     if (this.isPaused) {
       console.warn("Cannot change scene while an overlay is active.");
       return;
@@ -39,32 +41,41 @@ export class SceneManager {
     }
 
     this.currentScene = this.scenes.get(name) || null;
+    this.currentSceneName = this.currentScene ? name : null;
     this.pausedScene = null; // Ensure no scene is marked as paused
 
     if (this.currentScene) {
       if (import.meta.env.DEV) {
         console.log(`Entering scene: ${this.currentScene.constructor.name}`);
       }
-      this.currentScene.enter();
+      const maybePromise = this.currentScene.enter(params);
+      if (maybePromise instanceof Promise) {
+        maybePromise.catch(error => console.error('Scene enter failed', error));
+      }
     }
   }
 
   // For opening an overlay (e.g., Menu)
-  openOverlay(name: string): void {
+  openOverlay(name: string, params?: unknown): void {
     if (this.isPaused || !this.currentScene) return;
 
     this.isPaused = true;
     this.pausedScene = this.currentScene;
+    this.pausedSceneName = this.currentSceneName;
     if (this.pausedScene.pause) {
       this.pausedScene.pause();
     }
 
     this.currentScene = this.scenes.get(name) || null;
+    this.currentSceneName = this.currentScene ? name : this.currentSceneName;
     if (this.currentScene) {
        if (import.meta.env.DEV) {
         console.log(`Opening overlay: ${this.currentScene.constructor.name}`);
       }
-      this.currentScene.enter();
+      const maybePromise = this.currentScene.enter(params);
+      if (maybePromise instanceof Promise) {
+        maybePromise.catch(error => console.error('Overlay enter failed', error));
+      }
     }
   }
 
@@ -80,7 +91,9 @@ export class SceneManager {
     }
 
     this.currentScene = this.pausedScene;
+    this.currentSceneName = this.pausedSceneName;
     this.pausedScene = null;
+    this.pausedSceneName = null;
     this.isPaused = false;
 
     if (this.currentScene && this.currentScene.resume) {
@@ -89,10 +102,14 @@ export class SceneManager {
   }
 
 
-  start(initialSceneName: string): void {
-    this.changeScene(initialSceneName);
+  start(initialSceneName: string, params?: unknown): void {
+    this.changeScene(initialSceneName, params);
     this.lastTime = performance.now();
     requestAnimationFrame(this.gameLoop);
+  }
+
+  getCurrentSceneName(): string | null {
+    return this.currentSceneName;
   }
 
   destroy(): void {

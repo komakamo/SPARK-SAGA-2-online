@@ -9,6 +9,7 @@ import { ResultScene } from './scenes/ResultScene';
 import { MenuScene } from './scenes/MenuScene';
 import { FormationScene } from './scenes/FormationScene';
 import { loadGameData, gameData } from './data-loader';
+import { gameState } from './managers/GameState';
 
 const loadingScreen = document.getElementById('loading-screen')!;
 const errorScreen = document.getElementById('error-screen')!;
@@ -40,6 +41,8 @@ async function startGame() {
 
   loadingScreen.hidden = true;
   mainContent.hidden = false;
+
+  gameState.initialize();
 
   if (import.meta.env.DEV) {
     devDiagnostics.hidden = false;

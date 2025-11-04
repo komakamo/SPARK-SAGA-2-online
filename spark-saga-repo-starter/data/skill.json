@@ -4,13 +4,19 @@
     "name": "Gust Slash",
     "description": "A quick slash carried by the wind.",
     "power": 12,
-    "element": "wind"
+    "element": "slash",
+    "type": "physical",
+    "cost": { "wp": 4 },
+    "statusEffects": []
   },
   {
     "id": "flame",
     "name": "Flame",
     "description": "Ignites a small blaze to scorch the foe.",
-    "power": 14,
-    "element": "fire"
+    "power": 18,
+    "element": "fire",
+    "type": "magical",
+    "cost": { "jp": 5 },
+    "statusEffects": ["burn"]
   }
 ]

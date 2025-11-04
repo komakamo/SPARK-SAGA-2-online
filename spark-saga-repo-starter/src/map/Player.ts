@@ -46,10 +46,13 @@ export class Player {
     const newY = this.y + dy * this.speed * deltaTime;
 
     // Check all four corners of the player's bounding box
+    const right = newX + this.width - 1;
+    const bottom = newY + this.height - 1;
+
     if (!tilemap.isObstacle(newX, newY) &&
-        !tilemap.isObstacle(newX + this.width, newY) &&
-        !tilemap.isObstacle(newX, newY + this.height) &&
-        !tilemap.isObstacle(newX + this.width, newY + this.height)) {
+        !tilemap.isObstacle(right, newY) &&
+        !tilemap.isObstacle(newX, bottom) &&
+        !tilemap.isObstacle(right, bottom)) {
         this.x = newX;
         this.y = newY;
     }

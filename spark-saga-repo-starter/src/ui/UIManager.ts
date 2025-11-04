@@ -4,6 +4,13 @@ import { Action } from '../input/InputManager';
 import { ConversationManager } from '../managers/ConversationManager';
 import { EventNode } from '../schemas/event';
 
+export interface BattleMenuOption {
+  id: string;
+  label: string;
+  hint?: string;
+  disabled?: boolean;
+}
+
 export class UIManager {
   private container: HTMLElement | null;
   private header: HTMLElement | null;
@@ -18,6 +25,9 @@ export class UIManager {
   private choiceList: HTMLElement | null;
   private playerStatus: HTMLElement | null;
   private enemyStatus: HTMLElement | null;
+  private commandMenu: HTMLElement | null;
+  private skillMenu: HTMLElement | null;
+  private targetMenu: HTMLElement | null;
   private inputManager: InputManager;
   private conversationManager: ConversationManager;
   private conversationHistory: string[] = [];
@@ -36,6 +46,9 @@ export class UIManager {
     this.choiceList = this.getElementById('choice-list');
     this.playerStatus = this.getElementById('player-status');
     this.enemyStatus = this.getElementById('enemy-status');
+    this.commandMenu = this.getElementById('command-menu');
+    this.skillMenu = this.getElementById('skill-menu');
+    this.targetMenu = this.getElementById('target-menu');
     this.inputManager = inputManager;
     this.conversationManager = conversationManager;
 
@@ -114,20 +127,131 @@ export class UIManager {
     this.conversationOverlay.hidden = true;
   }
 
-  public updatePartyStatus(player: Combatant, enemy: Combatant): void {
+  public updateBattleStatus(allies: Combatant[], enemies: Combatant[]): void {
     if (!this.playerStatus || !this.enemyStatus) {
       console.warn('[UIManager] Status panel elements are missing.');
       return;
     }
 
-    this.playerStatus.innerHTML = `<strong>Player</strong><span>HP ${player.hp}/${player.maxHp} | LP ${player.lp}/${player.maxLp} | WP ${player.wp}/${player.maxWp} | JP ${player.jp}/${player.maxJp}</span><span class="status-effects">${this.getStatusEffectIcons(player)}</span>`;
-    this.enemyStatus.innerHTML = `<strong>Enemy</strong><span>HP ${enemy.hp}/${enemy.maxHp} | LP ${enemy.lp}/${enemy.maxLp} | WP ${enemy.wp}/${enemy.maxWp} | JP ${enemy.jp}/${enemy.maxJp}</span><span class="status-effects">${this.getStatusEffectIcons(enemy)}</span>`;
+    this.renderCombatantStatusPanel(this.playerStatus, 'Party', allies);
+    this.renderCombatantStatusPanel(this.enemyStatus, 'Enemies', enemies);
+  }
+
+  private renderCombatantStatusPanel(container: HTMLElement, label: string, members: Combatant[]): void {
+    container.innerHTML = '';
+    const heading = document.createElement('h2');
+    heading.textContent = label;
+    container.appendChild(heading);
+
+    const list = document.createElement('ul');
+    list.classList.add('status-list');
+
+    members.forEach((member) => {
+      const item = document.createElement('li');
+      item.classList.add('status-entry');
+      const name = document.createElement('strong');
+      name.textContent = this.getCombatantLabel(member);
+      const vitals = document.createElement('span');
+      vitals.textContent = `HP ${member.hp}/${member.maxHp} | LP ${member.lp}/${member.maxLp} | WP ${member.wp}/${member.maxWp} | JP ${member.jp}/${member.maxJp}`;
+      const effects = document.createElement('span');
+      effects.classList.add('status-effects');
+      effects.innerHTML = this.getStatusEffectIcons(member);
+
+      item.appendChild(name);
+      item.appendChild(vitals);
+      item.appendChild(effects);
+      list.appendChild(item);
+    });
+
+    container.appendChild(list);
+  }
+
+  private getCombatantLabel(combatant: Combatant): string {
+    return combatant.name ?? 'Unknown';
   }
 
   private getStatusEffectIcons(combatant: Combatant): string {
-    return combatant.statusEffects.map(effect =>
-      `<span class="status-effect-icon" title="${effect.definition.name} (${effect.duration})">${effect.definition.id.substring(0, 2).toUpperCase()}</span>`
-    ).join(' ');
+    if (combatant.statusEffects.length === 0) {
+      return '<span>-</span>';
+    }
+    return combatant.statusEffects
+      .map(
+        effect =>
+          `<span class="status-effect-icon" title="${effect.definition.name} (${effect.duration})">${effect.definition.id
+            .substring(0, 2)
+            .toUpperCase()}</span>`,
+      )
+      .join(' ');
+  }
+
+  public renderBattleMenu(
+    menu: 'command' | 'skill' | 'target',
+    options: BattleMenuOption[],
+    selectedIndex: number,
+    title: string,
+  ): void {
+    const container = this.getMenuContainer(menu);
+    if (!container) {
+      return;
+    }
+
+    container.hidden = false;
+    container.innerHTML = '';
+
+    const heading = document.createElement('h2');
+    heading.textContent = title;
+    container.appendChild(heading);
+
+    const list = document.createElement('ul');
+    options.forEach((option, index) => {
+      const item = document.createElement('li');
+      const button = document.createElement('div');
+      button.className = 'command-option';
+      if (index === selectedIndex) {
+        button.classList.add('selected');
+      }
+      if (option.disabled) {
+        button.classList.add('disabled');
+      }
+      const label = document.createElement('span');
+      label.textContent = option.label;
+      const hint = document.createElement('span');
+      hint.textContent = option.hint ?? '';
+      button.appendChild(label);
+      button.appendChild(hint);
+      item.appendChild(button);
+      list.appendChild(item);
+    });
+
+    container.appendChild(list);
+  }
+
+  public hideBattleMenu(menu: 'command' | 'skill' | 'target'): void {
+    const container = this.getMenuContainer(menu);
+    if (!container) {
+      return;
+    }
+    container.hidden = true;
+    container.innerHTML = '';
+  }
+
+  public clearBattleMenus(): void {
+    this.hideBattleMenu('command');
+    this.hideBattleMenu('skill');
+    this.hideBattleMenu('target');
+  }
+
+  private getMenuContainer(menu: 'command' | 'skill' | 'target'): HTMLElement | null {
+    switch (menu) {
+      case 'command':
+        return this.commandMenu;
+      case 'skill':
+        return this.skillMenu;
+      case 'target':
+        return this.targetMenu;
+      default:
+        return null;
+    }
   }
 
   private setupTouchControls(): void {

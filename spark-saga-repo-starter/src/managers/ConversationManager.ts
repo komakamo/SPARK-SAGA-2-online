@@ -18,8 +18,9 @@ export class ConversationManager {
   private gameState: any;
   private onStateChange: (() => void) | null = null;
 
-  private constructor(gameState: any = defaultGameState) {
+  constructor(gameState: any = defaultGameState) {
     this.gameState = gameState;
+    void this.loadEvents();
   }
 
   public static async initialize(gameState: any = defaultGameState) {
@@ -41,9 +42,9 @@ export class ConversationManager {
     }
   }
 
-  public startConversation(eventId: string, onStateChange: () => void) {
+  public startConversation(eventId: string, onStateChange?: () => void): EventNode | null {
     this.activeEvent = this.events.get(eventId) || null;
-    this.onStateChange = onStateChange;
+    this.onStateChange = onStateChange ?? null;
     if (this.activeEvent) {
       this.currentNode = this.activeEvent.nodes[0];
       this.processNode(this.currentNode);
@@ -51,6 +52,7 @@ export class ConversationManager {
     if (this.onStateChange) {
       this.onStateChange();
     }
+    return this.currentNode;
   }
 
   public handleChoice(choiceIndex: number) {

@@ -1,4 +1,36 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('../data-loader', () => ({
+  gameData: {
+    formation: {
+      byId: new Map([
+        [
+          'square',
+          {
+            id: 'square',
+            modifiers: {
+              front: {},
+              back: {},
+            },
+          },
+        ],
+      ]),
+    },
+    balance: {
+      physical_damage: {
+        weapon_attack_coefficient: 1,
+        strength_coefficient: 1,
+        defense_factor: 100,
+      },
+      magical_damage: {
+        staff_correction_coefficient: 1,
+        intelligence_coefficient: 1,
+        magic_defense_factor: 100,
+      },
+    },
+  },
+}));
+
 import { Combatant } from './Combatant';
 
 describe('Statistical Tests for Combat', () => {

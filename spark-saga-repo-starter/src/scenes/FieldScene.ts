@@ -6,6 +6,7 @@ import { Tilemap, TilemapData } from '../map/Tilemap';
 import { Player } from '../map/Player';
 import { EventManager } from '../managers/EventManager';
 import { ConversationManager } from '../managers/ConversationManager';
+import { gameData } from '../data-loader';
 
 export class FieldScene implements Scene {
   private element: HTMLElement;
@@ -18,6 +19,7 @@ export class FieldScene implements Scene {
   private player: Player;
   private eventManager: EventManager;
   private isDebugMode: boolean = false;
+  private defaultEncounterId: string | null = null;
 
   constructor(
     sceneManager: SceneManager,
@@ -32,6 +34,7 @@ export class FieldScene implements Scene {
     this.ctx = this.canvas.getContext('2d')!;
     this.player = new Player(32, 32);
     this.eventManager = new EventManager(this.uiManager, this.sceneManager.conversationManager);
+    this.defaultEncounterId = gameData.encounter?.all?.[0]?.id ?? null;
   }
 
   async enter(): Promise<void> {
@@ -95,7 +98,12 @@ export class FieldScene implements Scene {
     }
   }
 
-  private onEncounter(): void {
-    this.sceneManager.changeScene('battle');
+  private onEncounter(encounterId?: string): void {
+    const targetEncounter = encounterId ?? this.defaultEncounterId;
+    if (!targetEncounter) {
+      this.uiManager.log('戦闘データが見つかりませんでした。');
+      return;
+    }
+    this.sceneManager.changeScene('battle', { encounterId: targetEncounter });
   }
 }
