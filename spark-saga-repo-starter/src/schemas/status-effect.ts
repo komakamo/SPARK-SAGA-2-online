@@ -21,3 +21,4 @@ export const statusEffectSchema = z.object({
 });
 
 export type StatusEffect = z.infer<typeof statusEffectSchema>;
+export const statusEffectsSchema = z.array(statusEffectSchema);

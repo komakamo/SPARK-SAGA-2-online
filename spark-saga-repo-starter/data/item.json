@@ -1,0 +1,14 @@
+[
+  {
+    "id": "potion",
+    "name": "Potion",
+    "description": "Restores a small amount of HP.",
+    "effect": "heal_hp_small"
+  },
+  {
+    "id": "antidote",
+    "name": "Antidote",
+    "description": "Cures poison.",
+    "effect": "cure_poison"
+  }
+]

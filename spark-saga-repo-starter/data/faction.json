@@ -1,0 +1,15 @@
+[
+  {
+    "id": "frontier_guard",
+    "name": "Frontier Guard",
+    "description": "Protectors of the frontier village.",
+    "thresholds": [
+      {
+        "reputation": 10,
+        "effects": [
+          { "unlock_quest_id": "sample_quest" }
+        ]
+      }
+    ]
+  }
+]

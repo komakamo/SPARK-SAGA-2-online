@@ -95,7 +95,7 @@ export class BattleScene implements Scene {
   private attack(attacker: Combatant, target: Combatant): void {
     if (attacker === this.player) {
       // For demonstration, let's say the player's attack has a chance to poison.
-      const poisonEffect = gameData.statusEffects.find(se => se.id === 'poison');
+      const poisonEffect = gameData.statusEffects.all.find(se => se.id === 'poison');
       if (poisonEffect && Math.random() < 0.3) { // 30% chance to poison
         target.addStatusEffect(poisonEffect);
         this.log(`${target === this.player ? 'Player' : 'Enemy'} has been poisoned!`);

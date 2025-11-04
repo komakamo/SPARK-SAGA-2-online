@@ -1,0 +1,9 @@
+[
+  {
+    "id": "starter_monster",
+    "entries": [
+      { "item_id": "potion", "quantity": 1, "chance": 0.6 },
+      { "item_id": "antidote", "quantity": 1, "chance": 0.2 }
+    ]
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "sample_event.start": "You meet a traveler asking for aid.",
+  "sample_event.choice_a": "Give them a potion.",
+  "sample_event.choice_b": "Promise to help later.",
+  "sample_event.end": "The traveler thanks you and departs.",
+  "ui.battle.player_turn": "Your turn.",
+  "ui.battle.enemy_turn": "Enemy's turn."
+}

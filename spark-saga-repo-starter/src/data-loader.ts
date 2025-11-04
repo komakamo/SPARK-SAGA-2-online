@@ -25,6 +25,7 @@ const DATA_FILES = [
   'event.json',
   'faction.json',
   'formation.json',
+  'status-effect.json',
   'item.json',
   'loot_table.json',
   'quest.json',
@@ -100,6 +101,7 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
     'loot_table.json': async () => (await import('./schemas/loot_table')).lootTablesSchema,
     'balance.json': async () => (await import('./schemas/balance')).balanceSchema,
     'er.json': async () => (await import('./schemas/er')).erSchema,
+    'status-effect.json': async () => (await import('./schemas/status-effect')).statusEffectsSchema,
     'i18n/ja.json': async () => (await import('./schemas/i18n')).i18nSchema,
     'i18n/en.json': async () => (await import('./schemas/i18n')).i18nSchema,
   };
@@ -139,7 +141,7 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
   const armorIds = new Set(rawData['armor.json'].map((a: any) => a.id));
   const itemIds = new Set(rawData['item.json'].map((i: any) => i.id));
   const questIds = new Set(rawData['quest.json'].map((q: any) => q.id));
-  const balanceAffixKeys = new Set(rawData['balance.json'].affix_keys);
+  const balanceAffixKeys = new Set(rawData['balance.json'].affix_keys ?? []);
 
   // Check enemy skills
   rawData['enemy.json'].forEach((enemy: any) => {
@@ -268,8 +270,13 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
 
 
   // 4. Index data for fast lookups
+  const keyOverrides: Record<string, string> = {
+    'status-effect.json': 'statusEffects',
+  };
+
   for (const file in rawData) {
-    const key = file.replace('.json', '').replace('i18n/', 'i18n_');
+    const key =
+      keyOverrides[file] ?? file.replace('.json', '').replace('i18n/', 'i18n_').replace(/-/g, '');
     if (Array.isArray(rawData[file])) {
       gameData[key] = {
         byId: new Map(rawData[file].map((item: any) => [item.id, item])),

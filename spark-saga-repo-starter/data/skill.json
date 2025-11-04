@@ -1,0 +1,16 @@
+[
+  {
+    "id": "gust_slash",
+    "name": "Gust Slash",
+    "description": "A quick slash carried by the wind.",
+    "power": 12,
+    "element": "wind"
+  },
+  {
+    "id": "flame",
+    "name": "Flame",
+    "description": "Ignites a small blaze to scorch the foe.",
+    "power": 14,
+    "element": "fire"
+  }
+]
