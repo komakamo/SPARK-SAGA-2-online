@@ -1,39 +1,53 @@
 // spark-saga-repo-starter/src/managers/ConversationManager.ts
+import { gameData } from '../data-loader';
 import { eventsSchema, Event, EventNode } from '../schemas/event';
 
-// Mock game state for now
-const defaultGameState = {
+export interface ConversationGameState {
+  region: string;
+  er: number;
+  party: string[];
+  inventory: Record<string, number>;
+  quests: Map<string, string>;
+  flags: Map<string, boolean>;
+}
+
+const createDefaultGameState = (): ConversationGameState => ({
   region: 'tutorial',
   er: 1,
   party: ['hero'],
-  inventory: { 'potion': 1 },
+  inventory: { potion: 1 },
   quests: new Map<string, string>(),
-};
+  flags: new Map<string, boolean>(),
+});
 
 export class ConversationManager {
   private events: Map<string, Event> = new Map();
   private activeEvent: Event | null = null;
   public currentNode: EventNode | null = null;
-  private flags: Map<string, boolean> = new Map();
-  private gameState: any;
+  private flags: Map<string, boolean>;
+  private gameState: ConversationGameState;
   private onStateChange: (() => void) | null = null;
+  private onComplete: (() => void) | null = null;
 
-  constructor(gameState: any = defaultGameState) {
+  constructor(gameState: ConversationGameState = createDefaultGameState()) {
     this.gameState = gameState;
-    void this.loadEvents();
+    if (!this.gameState.flags) {
+      this.gameState.flags = new Map<string, boolean>();
+    }
+    this.flags = this.gameState.flags;
+    this.loadEvents();
   }
 
-  public static async initialize(gameState: any = defaultGameState) {
+  public static async initialize(gameState: ConversationGameState = createDefaultGameState()) {
     const manager = new ConversationManager(gameState);
-    await manager.loadEvents();
     return manager;
   }
 
-  private async loadEvents() {
+  private loadEvents() {
     try {
-      const response = await fetch('/data/event.json');
-      const data = await response.json();
+      const data = gameData.event?.all ?? [];
       const parsedEvents = eventsSchema.parse(data);
+      this.events.clear();
       for (const event of parsedEvents) {
         this.events.set(event.id, event);
       }
@@ -42,9 +56,10 @@ export class ConversationManager {
     }
   }
 
-  public startConversation(eventId: string, onStateChange?: () => void): EventNode | null {
+  public startConversation(eventId: string, onStateChange?: () => void, onComplete?: () => void): EventNode | null {
     this.activeEvent = this.events.get(eventId) || null;
     this.onStateChange = onStateChange ?? null;
+    this.onComplete = onComplete ?? null;
     if (this.activeEvent) {
       this.currentNode = this.activeEvent.nodes[0];
       this.processNode(this.currentNode);
@@ -94,22 +109,22 @@ export class ConversationManager {
 
     switch (node.type) {
       case 'set_flag':
-        this.flags.set(node.flag, node.value);
+        this.setFlag(node.flag, node.value);
         this.goToNode(node.next);
         shouldUpdateUI = false;
         break;
       case 'quest_start':
-        this.gameState.quests.set(node.quest_id, 'started');
+        this.updateQuest(node.quest_id, 'started');
         this.goToNode(node.next);
         shouldUpdateUI = false;
         break;
       case 'quest_update':
-        this.gameState.quests.set(node.quest_id, node.quest_state);
+        this.updateQuest(node.quest_id, node.quest_state);
         this.goToNode(node.next);
         shouldUpdateUI = false;
         break;
       case 'reward':
-        this.gameState.inventory[node.item_id] = (this.gameState.inventory[node.item_id] || 0) + node.quantity;
+        this.grantItem(node.item_id, node.quantity);
         this.goToNode(node.next);
         shouldUpdateUI = false;
         break;
@@ -133,9 +148,9 @@ export class ConversationManager {
   private isConditionMet(when: any): boolean {
     if (when.region && when.region !== this.gameState.region) return false;
     if (when.er_gte && when.er_gte > this.gameState.er) return false;
-    if (when.flags_has && !when.flags_has.every(flag => this.flags.get(flag))) return false;
+    if (when.flags_has && !when.flags_has.every(flag => this.getFlag(flag))) return false;
     if (when.party_has && !when.party_has.every(member => this.gameState.party.includes(member))) return false;
-    if (when.item_has && (this.gameState.inventory[when.item_has.id] || 0) < when.item_has.quantity) return false;
+    if (when.item_has && this.getItemQuantity(when.item_has.id) < when.item_has.quantity) return false;
     return true;
   }
 
@@ -145,5 +160,36 @@ export class ConversationManager {
     if (this.onStateChange) {
       this.onStateChange();
     }
+    if (this.onComplete) {
+      this.onComplete();
+    }
+    this.onComplete = null;
+  }
+
+  public setFlag(flag: string, value: boolean) {
+    this.flags.set(flag, value);
+  }
+
+  public getFlag(flag: string): boolean {
+    return this.flags.get(flag) ?? false;
+  }
+
+  public grantItem(itemId: string, quantity: number): number {
+    const current = this.gameState.inventory[itemId] ?? 0;
+    const next = current + quantity;
+    this.gameState.inventory[itemId] = next;
+    return next;
+  }
+
+  public getItemQuantity(itemId: string): number {
+    return this.gameState.inventory[itemId] ?? 0;
+  }
+
+  public updateQuest(questId: string, state: string): void {
+    this.gameState.quests.set(questId, state);
+  }
+
+  public getQuestState(questId: string): string | undefined {
+    return this.gameState.quests.get(questId);
   }
 }
