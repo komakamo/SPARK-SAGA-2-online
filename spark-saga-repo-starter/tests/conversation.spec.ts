@@ -1,7 +1,7 @@
 // spark-saga-repo-starter/tests/conversation.spec.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ConversationManager } from '../src/managers/ConversationManager';
-import { eventsSchema } from '../src/schemas/event';
+import { gameData } from '../src/data-loader';
 
 // Mock event data
 const mockEvents = [
@@ -47,34 +47,27 @@ const mockEvents = [
   }
 ];
 
-// Mock fetch
-global.fetch = vi.fn(() =>
-  Promise.resolve({
-    json: () => Promise.resolve(mockEvents),
-  })
-) as any;
-
 describe('ConversationManager', () => {
   let conversationManager: ConversationManager;
 
   beforeEach(() => {
+    gameData.event = {
+      byId: new Map(mockEvents.map(event => [event.id, event])),
+      all: mockEvents,
+    } as any;
     conversationManager = new ConversationManager();
   });
 
   it('should load events', async () => {
-    // Need to wait for the async loadEvents to complete
-    await new Promise(resolve => setTimeout(resolve, 100));
     expect(conversationManager['events'].size).toBe(1);
   });
 
   it('should start a conversation', async () => {
-    await new Promise(resolve => setTimeout(resolve, 100));
     const startNode = conversationManager.startConversation('sample_event');
     expect(startNode?.type).toBe('dialog');
   });
 
   it('should handle choices', async () => {
-    await new Promise(resolve => setTimeout(resolve, 100));
     conversationManager.startConversation('sample_event');
     conversationManager.next(); // progress to choice node
     conversationManager.handleChoice(0);
@@ -92,8 +85,6 @@ describe('ConversationManager', () => {
       quests: new Map<string, string>(),
     };
     conversationManager = new ConversationManager(gameState);
-    await new Promise(resolve => setTimeout(resolve, 100));
-
     conversationManager.startConversation('sample_event');
     conversationManager.next(); // progress to choice node
     conversationManager.handleChoice(1); // Choose to start the quest

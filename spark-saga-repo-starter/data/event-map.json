@@ -1,0 +1,38 @@
+[
+  {
+    "id": "field_conversation_001",
+    "tileEventId": 1,
+    "type": "conversation",
+    "conversationId": "sample_event",
+    "label": "村人",
+    "repeatable": true,
+    "effects": [
+      { "type": "log", "message": "村人: 今日も良い天気ですね。" },
+      { "type": "set_flag", "flagId": "met_sample_villager", "value": true }
+    ]
+  },
+  {
+    "id": "field_treasure_001",
+    "tileEventId": 2,
+    "type": "treasure",
+    "label": "木箱",
+    "repeatable": false,
+    "effects": [
+      { "type": "log", "message": "宝箱を開けた！" },
+      { "type": "give_item", "itemId": "potion", "quantity": 1 },
+      { "type": "set_flag", "flagId": "treasure_field_001_opened", "value": true }
+    ]
+  },
+  {
+    "id": "field_gather_001",
+    "tileEventId": 3,
+    "type": "gathering",
+    "label": "薬草の群生地",
+    "repeatable": true,
+    "cooldownMs": 60000,
+    "effects": [
+      { "type": "log", "message": "薬草を採取した。" },
+      { "type": "give_item", "itemId": "antidote", "quantity": 1 }
+    ]
+  }
+]

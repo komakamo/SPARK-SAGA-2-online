@@ -24,6 +24,7 @@ const DATA_FILES = [
   'enemy.json',
   'er.json',
   'event.json',
+  'event-map.json',
   'faction.json',
   'formation.json',
   'status-effect.json',
@@ -98,6 +99,7 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
     'encounter.json': async () => (await import('./schemas/encounter')).encountersSchema,
     'formation.json': async () => (await import('./schemas/formation')).formationsSchema,
     'event.json': async () => (await import('./schemas/event')).eventsSchema,
+    'event-map.json': async () => (await import('./schemas/event-map')).eventMapSchema,
     'party.json': async () => (await import('./schemas/party')).partiesSchema,
     'quest.json': async () => (await import('./schemas/quest')).questsSchema,
     'shop.json': async () => (await import('./schemas/shop')).shopsSchema,
@@ -145,6 +147,7 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
   const armorIds = new Set(rawData['armor.json'].map((a: any) => a.id));
   const itemIds = new Set(rawData['item.json'].map((i: any) => i.id));
   const questIds = new Set(rawData['quest.json'].map((q: any) => q.id));
+  const eventIds = new Set(rawData['event.json'].map((event: any) => event.id));
   const balanceAffixKeys = new Set(rawData['balance.json'].affix_keys ?? []);
   const formationIds = new Set(rawData['formation.json'].map((f: any) => f.id));
   const statusEffectIds = new Set(rawData['status-effect.json'].map((se: any) => se.id));
@@ -330,6 +333,38 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
     });
   });
 
+  if (rawData['event-map.json']) {
+    rawData['event-map.json'].forEach((entry: any) => {
+      if (entry.type === 'conversation' && !eventIds.has(entry.conversationId)) {
+        logs.push({
+          level: 'WARN',
+          code: 'DANGLING_EVENT_REFERENCE',
+          id: entry.id,
+          msg: `Event map entry "${entry.id}" references non-existent conversation "${entry.conversationId}"`,
+        });
+      }
+
+      entry.effects?.forEach((effect: any) => {
+        if (effect.type === 'give_item' && !itemIds.has(effect.itemId)) {
+          logs.push({
+            level: 'WARN',
+            code: 'DANGLING_ITEM_REFERENCE',
+            id: entry.id,
+            msg: `Event map entry "${entry.id}" references non-existent item "${effect.itemId}"`,
+          });
+        }
+        if (effect.type === 'quest_update' && !questIds.has(effect.questId)) {
+          logs.push({
+            level: 'WARN',
+            code: 'DANGLING_QUEST_REFERENCE',
+            id: entry.id,
+            msg: `Event map entry "${entry.id}" references non-existent quest "${effect.questId}"`,
+          });
+        }
+      });
+    });
+  }
+
   // Check quest rewards
   rawData['quest.json'].forEach((quest: any) => {
     if (quest.rewards && quest.rewards.items) {
@@ -413,16 +448,25 @@ export async function loadGameData(): Promise<{ logs: LogEntry[] }> {
   // 4. Index data for fast lookups
   const keyOverrides: Record<string, string> = {
     'status-effect.json': 'statusEffects',
+    'event-map.json': 'eventMap',
   };
 
   for (const file in rawData) {
     const key =
       keyOverrides[file] ?? file.replace('.json', '').replace('i18n/', 'i18n_').replace(/-/g, '');
     if (Array.isArray(rawData[file])) {
-      gameData[key] = {
-        byId: new Map(rawData[file].map((item: any) => [item.id, item])),
-        all: rawData[file],
-      };
+      if (file === 'event-map.json') {
+        gameData[key] = {
+          byId: new Map(rawData[file].map((item: any) => [item.id, item])),
+          byTileEventId: new Map(rawData[file].map((item: any) => [item.tileEventId, item])),
+          all: rawData[file],
+        };
+      } else {
+        gameData[key] = {
+          byId: new Map(rawData[file].map((item: any) => [item.id, item])),
+          all: rawData[file],
+        };
+      }
     } else {
       gameData[key] = rawData[file];
     }

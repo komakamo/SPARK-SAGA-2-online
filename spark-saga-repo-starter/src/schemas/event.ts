@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const idSchema = z.string().regex(/^[a-z][a-z0-9_]*$/);
+export const eventIdSchema = z.string().regex(/^[a-z][a-z0-9_]*$/);
 
 // Condition schema
 const whenSchema = z.object({
@@ -13,7 +13,7 @@ const whenSchema = z.object({
 
 // Node schemas
 const dialogNodeSchema = z.object({
-  id: idSchema,
+  id: eventIdSchema,
   type: z.literal('dialog'),
   text: z.string(), // i18n key
   next: z.string().nullable(),
@@ -21,14 +21,14 @@ const dialogNodeSchema = z.object({
 });
 
 const choiceNodeSchema = z.object({
-  id: idSchema,
+  id: eventIdSchema,
   type: z.literal('choice'),
   choices: z.array(z.object({ text: z.string(), next: z.string() })),
   when: whenSchema,
 });
 
 const setFlagNodeSchema = z.object({
-  id: idSchema,
+  id: eventIdSchema,
   type: z.literal('set_flag'),
   flag: z.string(),
   value: z.boolean(),
@@ -37,42 +37,42 @@ const setFlagNodeSchema = z.object({
 });
 
 const gotoNodeSchema = z.object({
-  id: idSchema,
+  id: eventIdSchema,
   type: z.literal('goto'),
   target: z.string(),
   when: whenSchema,
 });
 
 const questStartNodeSchema = z.object({
-  id: idSchema,
+  id: eventIdSchema,
   type: z.literal('quest_start'),
-  quest_id: idSchema,
+  quest_id: eventIdSchema,
   next: z.string().nullable(),
   when: whenSchema,
 });
 
 const questUpdateNodeSchema = z.object({
-  id: idSchema,
+  id: eventIdSchema,
   type: z.literal('quest_update'),
-  quest_id: idSchema,
+  quest_id: eventIdSchema,
   quest_state: z.string(),
   next: z.string().nullable(),
   when: whenSchema,
 });
 
 const battleNodeSchema = z.object({
-  id: idSchema,
+  id: eventIdSchema,
   type: z.literal('battle'),
-  encounter_id: idSchema,
+  encounter_id: eventIdSchema,
   on_win: z.string(),
   on_lose: z.string(),
   when: whenSchema,
 });
 
 const rewardNodeSchema = z.object({
-  id: idSchema,
+  id: eventIdSchema,
   type: z.literal('reward'),
-  item_id: idSchema,
+  item_id: eventIdSchema,
   quantity: z.number(),
   next: z.string().nullable(),
   when: whenSchema,
@@ -90,10 +90,13 @@ export const eventNodeSchema = z.discriminatedUnion('type', [
 ]);
 
 export const eventSchema = z.object({
-  id: idSchema,
+  id: eventIdSchema,
   name: z.string(),
   description: z.string(),
   nodes: z.array(eventNodeSchema),
 });
 
 export const eventsSchema = z.array(eventSchema);
+
+export type EventNode = z.infer<typeof eventNodeSchema>;
+export type Event = z.infer<typeof eventSchema>;
