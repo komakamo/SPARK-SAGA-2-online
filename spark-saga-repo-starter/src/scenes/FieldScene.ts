@@ -38,9 +38,18 @@ export class FieldScene implements Scene {
     this.element.hidden = false;
     this.uiManager.updateHelpDisplay();
 
-    const response = await fetch('/maps/field.json');
-    const data: TilemapData = await response.json();
-    this.tilemap = new Tilemap(data);
+    try {
+      const response = await fetch('/maps/field.json');
+      if (!response.ok) {
+        throw new Error(`Failed to load field map: ${response.status} ${response.statusText}`);
+      }
+      const data: TilemapData = await response.json();
+      this.tilemap = new Tilemap(data);
+    } catch (error) {
+      console.error('Failed to initialize FieldScene:', error);
+      this.uiManager.log('マップの読み込みに失敗しました。時間をおいて再試行してください。');
+      this.tilemap = null;
+    }
   }
 
   exit(): void {
@@ -51,11 +60,12 @@ export class FieldScene implements Scene {
     if (this.tilemap) {
       this.player.update(deltaTime, this.inputManager, this.tilemap);
     }
-    if (this.inputManager.isActionJustPressed(Action.Confirm)) {
-        const eventId = this.tilemap?.getEvent(this.player.x, this.player.y);
-        if (eventId) {
-            this.eventManager.triggerEvent(eventId);
-        }
+    if (this.inputManager.isActionJustPressed(Action.Confirm) && this.tilemap) {
+      const { x, y, width, height } = this.player.getBounds();
+      const eventId = this.tilemap.getEvent(x + width / 2, y + height / 2);
+      if (eventId) {
+        this.eventManager.triggerEvent(eventId);
+      }
     }
     if (this.inputManager.isActionJustPressed(Action.Menu)) {
         this.isDebugMode = !this.isDebugMode;

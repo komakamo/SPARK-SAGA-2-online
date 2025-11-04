@@ -91,6 +91,8 @@ dist
 # Gatsby build output
 .cache/
 public
+!spark-saga-repo-starter/public/
+!spark-saga-repo-starter/public/**
 
 # SvelteKit build output
 .svelte-kit

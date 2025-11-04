@@ -3,7 +3,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Player } from '../src/map/Player';
 import { Tilemap, TilemapData } from '../src/map/Tilemap';
 import { InputManager, Action } from '../src/input/InputManager';
-import { EventManager } from '../src/managers/EventManager';
 
 // Mock the global window and navigator objects
 vi.stubGlobal('window', {
@@ -33,11 +32,17 @@ describe('Player', () => {
         const tilemapData: TilemapData = {
             width: 10,
             height: 10,
-            tileWidth: 16,
-            tileHeight: 16,
+            tilewidth: 16,
+            tileheight: 16,
             layers: [
                 {
+                    id: 1,
                     name: 'collision',
+                    type: 'tilelayer',
+                    opacity: 1,
+                    visible: true,
+                    width: 10,
+                    height: 10,
                     data: [
                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                         1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -50,6 +55,16 @@ describe('Player', () => {
                         1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1
                     ]
+                },
+                {
+                    id: 2,
+                    name: 'events',
+                    type: 'tilelayer',
+                    opacity: 1,
+                    visible: true,
+                    width: 10,
+                    height: 10,
+                    data: new Array(100).fill(0)
                 }
             ],
             tilesets: [
@@ -85,17 +100,62 @@ describe('Player', () => {
     });
 });
 
-describe('EventManager', () => {
-    let eventManager: EventManager;
-
-    beforeEach(() => {
-        eventManager = new EventManager();
-    });
-
-    it('should trigger a conversation event', () => {
-        const event = eventManager.getEvent(1);
-        expect(event).toBeDefined();
-        // We can't test the alert, but we can check if the event is triggered
-        // In a real application, we would spy on the alert or use a mock
+describe('Tilemap events', () => {
+    it('returns the event id at the player position', () => {
+        const tilemapData: TilemapData = {
+            width: 2,
+            height: 2,
+            tilewidth: 16,
+            tileheight: 16,
+            layers: [
+                {
+                    id: 1,
+                    name: 'ground',
+                    type: 'tilelayer',
+                    opacity: 1,
+                    visible: true,
+                    width: 2,
+                    height: 2,
+                    data: [1, 1, 1, 1]
+                },
+                {
+                    id: 2,
+                    name: 'collision',
+                    type: 'tilelayer',
+                    opacity: 1,
+                    visible: true,
+                    width: 2,
+                    height: 2,
+                    data: [0, 0, 0, 0]
+                },
+                {
+                    id: 3,
+                    name: 'events',
+                    type: 'tilelayer',
+                    opacity: 1,
+                    visible: true,
+                    width: 2,
+                    height: 2,
+                    data: [0, 1, 0, 0]
+                }
+            ],
+            tilesets: [
+                {
+                    firstgid: 1,
+                    image: 'test.png',
+                    imageheight: 16,
+                    imagewidth: 16,
+                    margin: 0,
+                    spacing: 0,
+                    tilecount: 1,
+                    tileheight: 16,
+                    tilewidth: 16,
+                    columns: 1
+                }
+            ]
+        };
+        const map = new Tilemap(tilemapData);
+        expect(map.getEvent(16, 0)).toBe(1);
+        expect(map.getEvent(0, 0)).toBeNull();
     });
 });
