@@ -42,7 +42,8 @@ export class FieldScene implements Scene {
     this.uiManager.updateHelpDisplay();
 
     try {
-      const response = await fetch('/maps/field.json');
+      const mapUrl = new URL('maps/field.json', window.location.href).toString();
+      const response = await fetch(mapUrl);
       if (!response.ok) {
         throw new Error(`Failed to load field map: ${response.status} ${response.statusText}`);
       }
