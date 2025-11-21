@@ -2,6 +2,7 @@ import { Scene } from './Scene';
 import { SceneManager } from '../managers/SceneManager';
 import { InputManager, Action } from '../input/InputManager';
 import { UIManager } from '../ui/UIManager';
+import { gameData } from '../data-loader';
 
 export class FormationScene implements Scene {
   private element: HTMLElement;
